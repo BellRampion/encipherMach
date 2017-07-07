@@ -32,7 +32,8 @@ int main()
         debug = 1;
     }
     else debug = 0;
-
+	
+	printf("Enter $ to stop the program.\n");
     printf("Enter a letter: ");
 
     letter = getchar(); // "letter" will receive imput from the keyboard
