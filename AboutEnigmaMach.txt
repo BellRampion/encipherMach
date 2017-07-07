@@ -1,0 +1,11 @@
+A description of how the rotors step and when: http://www.intelligenia.org/downloads/rotors1.pdf
+A site that explains everything about the Enigma simply and with examples: https://www.codesandciphers.org.uk/enigma
+
+Note: "The Engima is designed so that the right hand rotor advances by one position immediately after the input key is depressed, and the current flows through the rotors while in this steppped-on position." -https://www.codesandciphers.org.uk/enigma
+The rotor turns /before/ the letter is enciphered! timesStepped should only increase once per letter--when the letter is first entered.
+
+http://enigmaco.de/enigma/enigma.html
+A virtual machine that shows how the rotors work
+
+http://users.telenet.be/d.rijmenants/en/enigmatech.htm
+An explaination of the Enigma. Note that when the rightmost rotor turns, the letters move forward by one /all around the circle/. So A -> B before going through the rotor, but on the opposite side of the rotor (where the letter comes out), D -> C because the D contact has moved into the C position.
