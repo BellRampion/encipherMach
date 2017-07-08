@@ -7,6 +7,10 @@
 /*The right-hand rotor is currently Rotor I; the middle rotor, Rotor II; and the left-hand rotor, Rotor III. The Reflector is Reflector B, since that was the standard reflector.*/
 
 #define printAsChar(expr, x, y) x = y; printf(#expr " %c\n", x);
+#define toUppercase(c) if (c >= 'a' && c <= 'z') \
+                            { \
+                                c+= ('A' - 'a'); \
+                            }
 
 int main()
 {
@@ -15,6 +19,7 @@ int main()
 	int sRestart; // The number of times that timesStepped has been set back to 1
     int newline; //Catches the newlines
     int debug;
+    int i;
 
 	timesStepped = 0; // timesStepped starts at 0
 	sRestart = 0;
@@ -24,7 +29,7 @@ int main()
 
     char cha; // A CHAR to convert the ASCII value to a letter
 
-    printf("Would you like to turn debugging on? (y/n): ");
+    printf("Would you like to turn debugging on? (y/n):\n ");
     debug = getchar();
     newline = getchar();
     if (debug == 'y')
@@ -32,11 +37,18 @@ int main()
         debug = 1;
     }
     else debug = 0;
-	
+
+    printf("Set rotor one: (enter an uppercase letter from A-Z): \n");
+    i = getchar();
+    newline = getchar();
+    toUppercase(i);
+    timesStepped = i - 'A'; //Entering A will produce a timesStepped of 0, entering B gives 1, and so on
 	printf("Enter $ to stop the program.\n");
     printf("Enter a letter: ");
 
-    letter = getchar(); // "letter" will receive imput from the keyboard
+    letter = getchar(); // "letter" will receive input from the keyboard
+    toUppercase(letter);
+    printAsChar(,cha, letter);
 
 	while (letter != '$') // While input is not equal to $, my EOF character
      {
@@ -55,12 +67,19 @@ int main()
 //		printf("letter %i ", letter); // Value of letter is printed. This is for error checking.
 		if (letter != 32)
 		{
+            if (timesStepped < 90)
+                ++timesStepped; //The rotor advances before enciphering the letter just entered. This is a feature of the real machine.
+            else
+            {
+                timesStepped-= 26;
+                ++timesStepped;
+            }
           	letter = letter + timesStepped; // Changes letter based on timesStepped
-          	++timesStepped; //The rotor advances before enciphering the letter just entered. This is a feature of the real machine.
-          	if (timesStepped == 17)
+
+/*          	if (timesStepped == 17)
           	{
           		++turnover1; //Notch to turn next rotor
-          	}
+          	}*/
 		}
         if (debug == 1)
         {
@@ -202,12 +221,12 @@ int main()
                 printAsChar(Letter + 26: , cha, letter); // More error checking
             }
 		}
-		if (turnover1 == 1)
+/*		if (turnover1 == 1)
 		{
 			--letter;
 			turnover1 = 0;
 			++turnover2;
-		}
+		} */
 
 		switch (letter) {
 		case 'A':
@@ -286,7 +305,7 @@ int main()
 			letter = 'O';
 			break;
 		case 'Z':
-			letter = 'P';
+			letter = 'E';
 			break;
 		default:
 			break;
@@ -301,11 +320,11 @@ int main()
 /*------------------------------------*****Left-hand rotor*****--------------------------------*/
 /*------------------------------------				    ------------------------------------*/
 
-		if (turnover2 == 26)
+/*		if (turnover2 == 26)
 		{
 			--letter;
 			turnover2 = 0;
-		}
+		} */
 
 		switch (letter) {
 		case 'A':
@@ -405,82 +424,82 @@ int main()
 ---|  */
 		switch (letter) {
 		case 'A':
-			letter = 'E';
-			break;
-		case 'B':
-			letter = 'J';
-			break;
-		case 'C':
-			letter = 'M';
-			break;
-		case 'D':
-			letter = 'Z';
-			break;
-		case 'E':
-			letter = 'A';
-			break;
-		case 'F':
-			letter = 'L';
-			break;
-		case 'G':
 			letter = 'Y';
 			break;
-		case 'H':
-			letter = 'X';
-			break;
-		case 'I':
-			letter = 'V';
-			break;
-		case 'J':
-			letter = 'B';
-			break;
-		case 'K':
-			letter = 'W';
-			break;
-		case 'L':
-			letter = 'F';
-			break;
-		case 'M':
-			letter = 'C';
-			break;
-		case 'N':
+		case 'B':
 			letter = 'R';
 			break;
-		case 'O':
-			letter = 'Q';
-			break;
-		case 'P':
+		case 'C':
 			letter = 'U';
 			break;
-		case 'Q':
-			letter = 'O';
-			break;
-		case 'R':
-			letter = 'N';
-			break;
-		case 'S':
-			letter = 'T';
-			break;
-		case 'T':
-			letter = 'S';
-			break;
-		case 'U':
-			letter = 'P';
-			break;
-		case 'V':
-			letter = 'I';
-			break;
-		case 'W':
-			letter = 'K';
-			break;
-		case 'X':
+		case 'D':
 			letter = 'H';
 			break;
-		case 'Y':
+		case 'E':
+			letter = 'Q';
+			break;
+		case 'F':
+			letter = 'S';
+			break;
+		case 'G':
+			letter = 'L';
+			break;
+		case 'H':
+			letter = 'D';
+			break;
+		case 'I':
+			letter = 'P';
+			break;
+		case 'J':
+			letter = 'X';
+			break;
+		case 'K':
+			letter = 'N';
+			break;
+		case 'L':
 			letter = 'G';
 			break;
+		case 'M':
+			letter = 'O';
+			break;
+		case 'N':
+			letter = 'K';
+			break;
+		case 'O':
+			letter = 'M';
+			break;
+		case 'P':
+			letter = 'I';
+			break;
+		case 'Q':
+			letter = 'E';
+			break;
+		case 'R':
+			letter = 'B';
+			break;
+		case 'S':
+			letter = 'F';
+			break;
+		case 'T':
+			letter = 'Z';
+			break;
+		case 'U':
+			letter = 'C';
+			break;
+		case 'V':
+			letter = 'W';
+			break;
+		case 'W':
+			letter = 'V';
+			break;
+		case 'X':
+			letter = 'J';
+			break;
+		case 'Y':
+			letter = 'A';
+			break;
 		case 'Z':
-			letter = 'D';
+			letter = 'T';
 			break;
 		default:
 			break;
@@ -495,11 +514,11 @@ int main()
 /*------------------------------------*****Back through the Left-hand rotor*****--------------------------------*/
 /*------------------------------------								 ------------------------------------*/
 
-		if (turnover2 == 26)
+/*		if (turnover2 == 26)
 		{
 			++letter;
 			turnover2 = 0;
-		}
+		}*/
 
 		switch (letter) {
 		case 'A':
@@ -594,12 +613,12 @@ int main()
 /*------------------------------------								  ------------------------------------*/
 
 
-		if (turnover1 == 1)
+/*		if (turnover1 == 1)
 		{
 			++letter;
 			turnover1 = 0;
 			++turnover2;
-		}
+		} */
 
 		switch (letter) {
 		case 'A':
@@ -836,20 +855,46 @@ int main()
                 printAsChar(Letter + 26: , cha, letter); // More error checking
             }
 		}
+        if (letter > 90) // If the new value is greater than 90, take away 26 and tell me
+		{
+		     letter = letter - 26;
+             if (debug == 1)
+             {
+                 printAsChar(Letter - 26: , cha, letter); // More error checking
+             }
+		}
 
+        letter-= timesStepped;
 
+		if (letter < 65 && letter != 10 && letter != 32)
+		{
+			letter = letter + 26;
+            if (debug == 1)
+            {
+                printAsChar(Letter + 26: , cha, letter); // More error checking
+            }
+		}
+        if (debug == 1)
+        {
+            printAsChar(Letter - timesStepped:, cha, letter);
+        }
 		cha = letter; // the CHAR is equal to the value of letter, and this converts the ASCII back to a letter
-		printf("Ciphertext: %c\n", cha); // Print it
+		printf("%c", cha); // Print it
+        if (debug == 1)
+        {
+            printf("\n");
+        }
 
-        printf("Enter a letter: ");
+//        printf("Enter a letter: ");
 		letter = getchar();
 		if (letter == 10)
 		{
 			newline = letter;
 			letter = getchar();
 		}
+        toUppercase(letter);
 
 	}
-
+    return 0;
 
  }
