@@ -1,6 +1,5 @@
 #include <stdio.h>
 
-/*IT WORKS!!!! If and ONLY if one letter is inputted for each time the program is run. But still! */
 
 /*This program is my complete cipher machine coded without functions or included documents. Each section of code, that for each rotor and the reflector, is separated by a long comment that informs the programmer which section they are about to enter.*/
 
@@ -20,6 +19,7 @@ int main()
     int newline; //Catches the newlines
     int debug;
     int i;
+    int spaces;
 
 	timesStepped = 0; // timesStepped starts at 0
 	sRestart = 0;
@@ -48,7 +48,7 @@ int main()
 
     letter = getchar(); // "letter" will receive input from the keyboard
     toUppercase(letter);
-    printAsChar(,cha, letter);
+//    printAsChar(,cha, letter);
 
 	while (letter != '$') // While input is not equal to $, my EOF character
      {
@@ -892,6 +892,11 @@ int main()
 			newline = letter;
 			letter = getchar();
 		}
+        else if (letter == 32)
+        {
+            spaces = letter;
+        }
+        
         toUppercase(letter);
 
 	}
