@@ -1,15 +1,18 @@
 #include <stdio.h>
 
 
-/*This program is my complete cipher machine coded without functions or included documents. Each section of code, that for each rotor and the reflector, is separated by a long comment that informs the programmer which section they are about to enter.*/
+/*Each section of code, that for each rotor and the reflector, is separated by a long comment that informs the programmer which section they are about to enter.*/
 
 /*The right-hand rotor is currently Rotor I; the middle rotor, Rotor II; and the left-hand rotor, Rotor III. The Reflector is Reflector B, since that was the standard reflector.*/
 
+#define MAXLENGTH 10000
 #define printAsChar(expr, x, y) x = y; printf(#expr " %c\n", x);
+#define printNl printf("\n")
 #define toUppercase(c) if (c >= 'a' && c <= 'z') \
                             { \
                                 c+= ('A' - 'a'); \
                             }
+int bgetline(char s[]);
 
 int main()
 {
@@ -18,16 +21,19 @@ int main()
 	int sRestart; // The number of times that timesStepped has been set back to 1
     int newline; //Catches the newlines
     int debug;
-    int i;
+    int i, j, k;
     int spaces;
+    int deftSet;
 
 	timesStepped = 0; // timesStepped starts at 0
 	sRestart = 0;
 	int turnover1 = 0;
 	int turnover2 = 0;
     debug = 0;
+    i = j = k = 0;
 
     char cha; // A CHAR to convert the ASCII value to a letter
+    char input[MAXLENGTH];
 
     printf("Would you like to turn debugging on? (y/n):\n ");
     debug = getchar();
@@ -38,19 +44,26 @@ int main()
     }
     else debug = 0;
 
+//    printf("Which rotor would you like as the right-hand rotor? (1, 2, or 3): ");
+//    i = getchar();
+//    printNl;
+
     printf("Set rotor one: (enter an uppercase letter from A-Z): \n");
     i = getchar();
     newline = getchar();
     toUppercase(i);
     timesStepped = i - 'A'; //Entering A will produce a timesStepped of 0, entering B gives 1, and so on
 	printf("Enter $ to stop the program.\n");
-    printf("Enter a letter: ");
+    printf("Enter a letter or phrase. Press the Return key when done: ");
 
-    letter = getchar(); // "letter" will receive input from the keyboard
+    i = bgetline(input);
+
+    letter = input[k]; // "letter" will receive input from the keyboard
+    k++;
     toUppercase(letter);
 //    printAsChar(,cha, letter);
 
-	while (letter != '$') // While input is not equal to $, my EOF character
+	while (letter != '$' && letter != '\0') // While input is not equal to $, my EOF character
      {
 
 /*------------------------------------					   ------------------------------------*/
@@ -65,7 +78,7 @@ int main()
 
 
 //		printf("letter %i ", letter); // Value of letter is printed. This is for error checking.
-		if (letter != 32)
+		if (letter != 32 && letter != 10)
 		{
             if (timesStepped < 90)
                 ++timesStepped; //The rotor advances before enciphering the letter just entered. This is a feature of the real machine.
@@ -74,8 +87,10 @@ int main()
                 timesStepped-= 26;
                 ++timesStepped;
             }
-          	letter = letter + timesStepped; // Changes letter based on timesStepped
-
+            if (letter != 10)
+            {
+                letter = letter + timesStepped; // Changes letter based on timesStepped
+            }
 /*          	if (timesStepped == 17)
           	{
           		++turnover1; //Notch to turn next rotor
@@ -195,9 +210,9 @@ int main()
 /*------------------------------------					------------------------------------*/
 
 
-		if (letter != 32) //According to Wikipedia, the Middle rotor was affected by the stepping as well. When the whole Right-hand rotor turned, the contacts changed. i.e. If the rotor stepped once, when A was pressed, it would go through the B path and become K. The K would go into the Middle rotor as J.
+		if (letter != 32 && letter != 10) //According to Wikipedia, the Middle rotor was affected by the stepping as well. When the whole Right-hand rotor turned, the contacts changed. i.e. If the rotor stepped once, when A was pressed, it would go through the B path and become K. The K would go into the Middle rotor as J.
 		{
-            letter = letter - timesStepped; // Changes letter based on timesStepped
+            letter-= timesStepped; // Changes letter based on timesStepped
             if (debug == 1)
             {
                 printAsChar(Letter - timesStepped: , cha, letter); // More error checking
@@ -707,7 +722,7 @@ int main()
             printAsChar(Letter after second time through middle rotor: , cha, letter);
         }
 
-		if (letter != 32) //According to Wikipedia, the Middle rotor was affected by the stepping as well. When the whole Right-hand rotor turned, the contacts changed. i.e. If the rotor stepped once, when A was pressed, it would go through the B path and become K. The K would go into the Middle rotor as J.
+		if (letter != 32 && letter != 10) //According to Wikipedia, the Middle rotor was affected by the stepping as well. When the whole Right-hand rotor turned, the contacts changed. i.e. If the rotor stepped once, when A was pressed, it would go through the B path and become K. The K would go into the Middle rotor as J.
 		{
          		letter = letter + timesStepped; // Changes letter based on timesStepped
                 if (debug == 1)
@@ -847,7 +862,7 @@ int main()
              }
 		}
 
-		if (letter < 65 && letter != 32)
+		if (letter < 65 && letter != 32 && letter != 10)
 		{
 			letter = letter + 26;
             if (debug == 1)
@@ -864,8 +879,10 @@ int main()
              }
 		}
 
-        letter-= timesStepped;
-
+        if (letter != 10)
+        {
+            letter-= timesStepped;
+        }
 		if (letter < 65 && letter != 10 && letter != 32)
 		{
 			letter = letter + 26;
@@ -878,28 +895,56 @@ int main()
         {
             printAsChar(Letter - timesStepped:, cha, letter);
         }
-		cha = letter; // the CHAR is equal to the value of letter, and this converts the ASCII back to a letter
-		printf("%c", cha); // Print it
+        if (j != 1)
+        {
+            cha = letter; // the CHAR is equal to the value of letter, and this converts the ASCII back to a letter
+            printf("%c", cha); // Print it
+        }
+        else printNl;
+
         if (debug == 1)
         {
-            printf("\n");
+            printNl;
         }
 
-//        printf("Enter a letter: ");
-		letter = getchar();
-		if (letter == 10)
+		letter = input[k];
+        k++;
+        if (letter == 10)
 		{
 			newline = letter;
-			letter = getchar();
+            j = 1;
+			//letter = input[k];
 		}
         else if (letter == 32)
         {
             spaces = letter;
+            letter = 'X';
         }
-        
+        else j = 0;
+
         toUppercase(letter);
 
 	}
     return 0;
 
- }
+}
+int bgetline(char s[]){
+	int i;
+	int c;
+
+	for (i=0; i<MAXLENGTH-1 && (c=getchar()) !='$' && c!='\n'; ++i){
+		s[i] = c;
+        if (c == 32)
+        {
+            i++;
+            s[i] = c; 
+        }
+    }
+	if (c == '\n')
+	{
+		s[i] = c;
+		++i;
+	}
+	s[i] = '\0';
+	return i;
+}
