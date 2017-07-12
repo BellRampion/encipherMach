@@ -1,4 +1,3 @@
 # encipherMach
 NOTES: 
-Only enter uppercase letters! Until further notice, this program only takes uppercase-letter input. 
-Also, rerun the program each time you enter a letter. Close the program by entering $ or Ctrl + C.
+Program now handles spaces, but must be rerun after each newline is entered. Up to 10,098 characters may be entered at once. Spaces count as two characters, because they are replaced by XX. (That is how spaces were entered on the Enigma.)
