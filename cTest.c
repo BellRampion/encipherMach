@@ -931,6 +931,9 @@ int main()
         toUppercase(letter);
 
 	}
+
+    printf("Enter any letter to close the program: \n");
+    i = getchar();
     return 0;
 
 }
