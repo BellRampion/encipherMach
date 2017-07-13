@@ -18,7 +18,6 @@ int main()
 {
 	int letter; // The ASCII value of the key pressed
 	int timesStepped; // The number of times the loop has been run, up to 26 (then it starts over)
-	int sRestart; // The number of times that timesStepped has been set back to 1
     int newline; //Catches the newlines
     int debug;
     int i, j, k;
@@ -26,7 +25,6 @@ int main()
     int deftSet;
 
 	timesStepped = 0; // timesStepped starts at 0
-	sRestart = 0;
 	int turnover1 = 0;
 	int turnover2 = 0;
     debug = 0;
@@ -80,12 +78,20 @@ int main()
 //		printf("letter %i ", letter); // Value of letter is printed. This is for error checking.
 		if (letter != 32 && letter != 10)
 		{
-            if (timesStepped < 90)
+            if (timesStepped < 25)
+            {
                 ++timesStepped; //The rotor advances before enciphering the letter just entered. This is a feature of the real machine.
+                //printf("\nIncreased timesStepped by one: %i\n", timesStepped);
+            }
             else
             {
-                timesStepped-= 26;
-                ++timesStepped;
+                timesStepped-= 25;
+                if (debug == 1)
+                {
+                    printf("timesStepped after rotating: %i\n", timesStepped);
+                }
+        //        ++timesStepped;
+        //        printf("timesStepped: %i\n", timesStepped);
             }
             if (letter != 10)
             {
@@ -101,7 +107,7 @@ int main()
             printAsChar(letter + timesStepped: , cha, letter); // More error checking
         }
 
-        if (letter > 90) // If the new value is greater than 90, take away 25 and tell me
+        if (letter > 90) // If the new value is greater than 90, take away 26 and tell me
 		{
 		    letter = letter - 26;
             if (debug == 1)
@@ -937,7 +943,7 @@ int bgetline(char s[]){
         if (c == 32)
         {
             i++;
-            s[i] = c; 
+            s[i] = c;
         }
     }
 	if (c == '\n')
