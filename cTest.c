@@ -530,15 +530,14 @@ int main()
 
 	}
 
-<<<<<<< HEAD
     fp = fopen("output.txt", "a");
     fprintf(fp, "\n==========================================================\n");
     fprintf(fp, "%s", output);
     fclose(fp);
 
     /*printf("WARNING: All input and output will be deleted when you next run this program. Copy the file to a different location to save your data.\n"); */
-=======
->>>>>>> a9daae45daad9aa839cfbaccb31fd3896b0d1256
+
+
     printf("Enter any letter to close the program: \n");
     i = getchar();
     return 0;
