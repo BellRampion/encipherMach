@@ -16,22 +16,34 @@ int bgetline(char s[]);
 
 int main()
 {
+    //ints
 	int letter; // The ASCII value of the key pressed
-	int timesStepped; // The number of times the loop has been run, up to 26 (then it starts over)
+	int offset1; // Offset for the first rotor (or times the rotor has moved one step forward)
     int newline; //Catches the newlines
     int debug;
-    int i, j, k;
+    int i, j, k, l;
     int spaces;
     int deftSet;
+    int turnover1; //For the notches on the rotors
+    int turnover2; //For the notches on the rotors
+    int offset2; //Offset for the second rotor
+    int offset3; //Offset for the third rotor
 
-	timesStepped = 0; // timesStepped starts at 0
-	int turnover1 = 0;
-	int turnover2 = 0;
-    debug = 0;
-    i = j = k = 0;
-
+    //chars
     char cha; // A CHAR to convert the ASCII value to a letter
     char input[MAXLENGTH];
+    char output[MAXLENGTH];
+
+    //FILEs
+    FILE *fp;
+
+	offset1 = 0; // offset1 starts at 0
+	turnover1 = 0;
+	turnover2 = 0;
+    offset2 = 0;
+    offset3 = 0;
+    debug = 0;
+    i = j = k = l = 0;
 
     printf("Would you like to turn debugging on? (y/n):\n ");
     debug = getchar();
@@ -46,15 +58,45 @@ int main()
 //    i = getchar();
 //    printNl;
 
-    printf("Set rotor one: (enter an uppercase letter from A-Z): \n");
+    fp = fopen("key_settings.txt", "a"); //Opens a file for appending to add the key settings for this message
+
+    printf("Set right-hand rotor: (enter an uppercase letter from A-Z): \n");
     i = getchar();
     newline = getchar();
     toUppercase(i);
-    timesStepped = i - 'A'; //Entering A will produce a timesStepped of 0, entering B gives 1, and so on
+    cha = i;
+    fprintf(fp, "\n%c", cha);
+    offset1 = i - 'A'; //Entering A will produce a offset1 of 0, entering B gives 1, and so on
+
+    printf("Set middle rotor: (enter an uppercase letter from A-Z): \n");
+    i = getchar();
+    newline = getchar();
+    toUppercase(i);
+    cha = i;
+    fprintf(fp, "%c", cha);
+    offset2 = i - 'A'; //Entering A will produce an offset of 0, entering B gives 1, and so on
+
+    printf("Set left-hand rotor: (enter an uppercase letter from A-Z): \n");
+    i = getchar();
+    newline = getchar();
+    toUppercase(i);
+    cha = i;
+    fprintf(fp, "%c", cha);
+    offset3 = i - 'A'; //Entering A will produce a offset1 of 0, entering B gives 1, and so on
+
+    fclose(fp); //Closes key_settings
+
+    if (debug == 1)
+        printf("Offset1: %i\n Offset2: %i\n Offset3: %i\n", offset1, offset2, offset3);
+
 	printf("Enter $ to stop the program.\n");
     printf("Enter a letter or phrase. Press the Return key when done: ");
 
     i = bgetline(input);
+    fp = fopen("input.txt", "a"); //Will record the input from the keyboard
+    fprintf(fp, "\n==============================================================\n");
+    fprintf(fp, "%s", input);
+    fclose(fp);
 
     letter = input[k]; // "letter" will receive input from the keyboard
     k++;
@@ -78,33 +120,31 @@ int main()
 //		printf("letter %i ", letter); // Value of letter is printed. This is for error checking.
 		if (letter != 32 && letter != 10)
 		{
-            if (timesStepped < 25)
+            if (offset1 < 25)
             {
-                ++timesStepped; //The rotor advances before enciphering the letter just entered. This is a feature of the real machine.
-                //printf("\nIncreased timesStepped by one: %i\n", timesStepped);
+                ++offset1; //The rotor advances before enciphering the letter just entered. This is a feature of the real machine.
+                //printf("\nIncreased offset1 by one: %i\n", offset1);
             }
             else
             {
-                timesStepped-= 25;
+                offset1-= 25;
                 if (debug == 1)
                 {
-                    printf("timesStepped after rotating: %i\n", timesStepped);
+                    printf("offset1 after rotating: %i\n", offset1);
                 }
-        //        ++timesStepped;
-        //        printf("timesStepped: %i\n", timesStepped);
             }
             if (letter != 10)
             {
-                letter = letter + timesStepped; // Changes letter based on timesStepped
+                letter = letter + offset1; // Changes letter based on offset1
             }
-/*          	if (timesStepped == 17)
+/*          	if (offset1 == 17)
           	{
           		++turnover1; //Notch to turn next rotor
           	}*/
 		}
         if (debug == 1)
         {
-            printAsChar(letter + timesStepped: , cha, letter); // More error checking
+            printAsChar(letter + offset1: , cha, letter); // More error checking
         }
 
         if (letter > 90) // If the new value is greater than 90, take away 26 and tell me
@@ -124,88 +164,7 @@ int main()
             }
         }
 
-		switch (letter) {
-		case 'A':
-			letter = 'E';
-			break;
-		case 'B':
-			letter = 'K';
-			break;
-		case 'C':
-			letter = 'M';
-			break;
-		case 'D':
-			letter = 'F';
-			break;
-		case 'E':
-			letter = 'L';
-			break;
-		case 'F':
-			letter = 'G';
-			break;
-		case 'G':
-			letter = 'D';
-			break;
-		case 'H':
-			letter = 'Q';
-			break;
-		case 'I':
-			letter = 'V';
-			break;
-		case 'J':
-			letter = 'Z';
-			break;
-		case 'K':
-			letter = 'N';
-			break;
-		case 'L':
-			letter = 'T';
-			break;
-		case 'M':
-			letter = 'O';
-			break;
-		case 'N':
-			letter = 'W';
-			break;
-		case 'O':
-			letter = 'Y';
-			break;
-		case 'P':
-			letter = 'H';
-			break;
-		case 'Q':
-			letter = 'X';
-			break;
-		case 'R':
-			letter = 'U';
-			break;
-		case 'S':
-			letter = 'S';
-			break;
-		case 'T':
-			letter = 'P';
-			break;
-		case 'U':
-			letter = 'A';
-			break;
-		case 'V':
-			letter = 'I';
-			break;
-		case 'W':
-			letter = 'B';
-			break;
-		case 'X':
-			letter = 'R';
-			break;
-		case 'Y':
-			letter = 'C';
-			break;
-		case 'Z':
-			letter = 'J';
-			break;
-		default:
-			break;
-		}
+	#include "r1" //Includes wiring for first rotor
         if (debug == 1)
         {
             printAsChar(Letter after first time through first rotor: , cha, letter);
@@ -218,21 +177,12 @@ int main()
 
 		if (letter != 32 && letter != 10) //According to Wikipedia, the Middle rotor was affected by the stepping as well. When the whole Right-hand rotor turned, the contacts changed. i.e. If the rotor stepped once, when A was pressed, it would go through the B path and become K. The K would go into the Middle rotor as J.
 		{
-            letter-= timesStepped; // Changes letter based on timesStepped
+            letter-= offset1; // Changes letter based on offset1
             if (debug == 1)
             {
-                printAsChar(Letter - timesStepped: , cha, letter); // More error checking
+                printAsChar(Letter - offset1: , cha, letter); // More error checking
             }
         }
-
-		if (letter > 90) // If the new value is greater than 90, take away 25 and tell me
-		{
-		     letter = letter - 26;
-             if (debug == 1)
-             {
-                 printAsChar(Letter - 26: , cha, letter); // More error checking
-             }
-		}
 
 		if (letter < 65 && letter != 10 && letter != 32)
 		{
@@ -242,6 +192,24 @@ int main()
                 printAsChar(Letter + 26: , cha, letter); // More error checking
             }
 		}
+
+        if (letter != 32 && letter != 10) //Changing letter based on offset2
+		{
+            letter+= offset2; // Changes letter based on offset2
+            if (debug == 1)
+            {
+                printAsChar(Letter + offset2: , cha, letter); // More error checking
+            }
+        }
+        if (letter > 90) // If the new value is greater than 90, take away 25 and tell me
+		{
+		     letter = letter - 26;
+             if (debug == 1)
+             {
+                 printAsChar(Letter - 26: , cha, letter); // More error checking
+             }
+		}
+
 /*		if (turnover1 == 1)
 		{
 			--letter;
@@ -249,89 +217,7 @@ int main()
 			++turnover2;
 		} */
 
-		switch (letter) {
-		case 'A':
-			letter = 'A';
-			break;
-		case 'B':
-			letter = 'J';
-			break;
-		case 'C':
-			letter = 'D';
-			break;
-		case 'D':
-			letter = 'K';
-			break;
-		case 'E':
-			letter = 'S';
-			break;
-		case 'F':
-			letter = 'I';
-			break;
-		case 'G':
-			letter = 'R';
-			break;
-		case 'H':
-			letter = 'U';
-			break;
-		case 'I':
-			letter = 'X';
-			break;
-		case 'J':
-			letter = 'B';
-			break;
-		case 'K':
-			letter = 'L';
-			break;
-		case 'L':
-			letter = 'H';
-			break;
-		case 'M':
-			letter = 'W';
-			break;
-		case 'N':
-			letter = 'T';
-			break;
-		case 'O':
-			letter = 'M';
-			break;
-		case 'P':
-			letter = 'C';
-			break;
-		case 'Q':
-			letter = 'Q';
-			break;
-		case 'R':
-			letter = 'G';
-			break;
-		case 'S':
-			letter = 'Z';
-			break;
-		case 'T':
-			letter = 'N';
-			break;
-		case 'U':
-			letter = 'P';
-			break;
-		case 'V':
-			letter = 'Y';
-			break;
-		case 'W':
-			letter = 'F';
-			break;
-		case 'X':
-			letter = 'V';
-			break;
-		case 'Y':
-			letter = 'O';
-			break;
-		case 'Z':
-			letter = 'E';
-			break;
-		default:
-			break;
-
-		}
+		#include "r2" //Includes the wiring for the 2nd rotor
         if (debug == 1)
         {
             printAsChar(Letter after first time through middle rotor: , cha, letter);
@@ -341,95 +227,48 @@ int main()
 /*------------------------------------*****Left-hand rotor*****--------------------------------*/
 /*------------------------------------				    ------------------------------------*/
 
+        if (letter != 32 && letter != 10) //Changing letter based on offset2
+        {
+            letter-= offset2; // Changes letter based on offset2
+            if (debug == 1)
+            {
+                printAsChar(Letter - offset2: , cha, letter); // More error checking
+            }
+        }
+        if (letter < 65 && letter != 10 && letter != 32)
+        {
+            letter = letter + 26;
+            if (debug == 1)
+            {
+                printAsChar(Letter + 26: , cha, letter); // More error checking
+            }
+        }
+
+        if (letter != 32 && letter != 10) //Changing letter based on offset2
+        {
+            letter+= offset3; // Changes letter based on offset2
+            if (debug == 1)
+            {
+                printAsChar(Letter + offset3: , cha, letter); // More error checking
+            }
+        }
+        if (letter > 90) // If the new value is greater than 90, take away 25 and tell me
+        {
+            letter = letter - 26;
+            if (debug == 1)
+            {
+                printAsChar(Letter - 26: , cha, letter); // More error checking
+            }
+        }
+
 /*		if (turnover2 == 26)
 		{
 			--letter;
 			turnover2 = 0;
 		} */
 
-		switch (letter) {
-		case 'A':
-			letter = 'B';
-			break;
-		case 'B':
-			letter = 'D';
-			break;
-		case 'C':
-			letter = 'F';
-			break;
-		case 'D':
-			letter = 'H';
-			break;
-		case 'E':
-			letter = 'J';
-			break;
-		case 'F':
-			letter = 'L';
-			break;
-		case 'G':
-			letter = 'C';
-			break;
-		case 'H':
-			letter = 'P';
-			break;
-		case 'I':
-			letter = 'R';
-			break;
-		case 'J':
-			letter = 'T';
-			break;
-		case 'K':
-			letter = 'X';
-			break;
-		case 'L':
-			letter = 'V';
-			break;
-		case 'M':
-			letter = 'Z';
-			break;
-		case 'N':
-			letter = 'N';
-			break;
-		case 'O':
-			letter = 'Y';
-			break;
-		case 'P':
-			letter = 'E';
-			break;
-		case 'Q':
-			letter = 'I';
-			break;
-		case 'R':
-			letter = 'W';
-			break;
-		case 'S':
-			letter = 'G';
-			break;
-		case 'T':
-			letter = 'A';
-			break;
-		case 'U':
-			letter = 'K';
-			break;
-		case 'V':
-			letter = 'M';
-			break;
-		case 'W':
-			letter = 'U';
-			break;
-		case 'X':
-			letter = 'S';
-			break;
-		case 'Y':
-			letter = 'Q';
-			break;
-		case 'Z':
-			letter = 'O';
-			break;
-		default:
-			break;
+		#include "r3"
 
-		}
         if (debug == 1)
         {
             printAsChar(Letter after first time through left-hand rotor: , cha, letter);
@@ -443,301 +282,139 @@ int main()
 ---|
    | Imagine a sideways U.
 ---|  */
-		switch (letter) {
-		case 'A':
-			letter = 'Y';
-			break;
-		case 'B':
-			letter = 'R';
-			break;
-		case 'C':
-			letter = 'U';
-			break;
-		case 'D':
-			letter = 'H';
-			break;
-		case 'E':
-			letter = 'Q';
-			break;
-		case 'F':
-			letter = 'S';
-			break;
-		case 'G':
-			letter = 'L';
-			break;
-		case 'H':
-			letter = 'D';
-			break;
-		case 'I':
-			letter = 'P';
-			break;
-		case 'J':
-			letter = 'X';
-			break;
-		case 'K':
-			letter = 'N';
-			break;
-		case 'L':
-			letter = 'G';
-			break;
-		case 'M':
-			letter = 'O';
-			break;
-		case 'N':
-			letter = 'K';
-			break;
-		case 'O':
-			letter = 'M';
-			break;
-		case 'P':
-			letter = 'I';
-			break;
-		case 'Q':
-			letter = 'E';
-			break;
-		case 'R':
-			letter = 'B';
-			break;
-		case 'S':
-			letter = 'F';
-			break;
-		case 'T':
-			letter = 'Z';
-			break;
-		case 'U':
-			letter = 'C';
-			break;
-		case 'V':
-			letter = 'W';
-			break;
-		case 'W':
-			letter = 'V';
-			break;
-		case 'X':
-			letter = 'J';
-			break;
-		case 'Y':
-			letter = 'A';
-			break;
-		case 'Z':
-			letter = 'T';
-			break;
-		default:
-			break;
 
-		}
+        if (letter != 32 && letter != 10) //Changing letter based on offset3
+        {
+            letter-= offset3; // Changes letter based on offset3
+            if (debug == 1)
+            {
+                printAsChar(Letter - offset3: , cha, letter); // More error checking
+            }
+        }
+        if (letter < 65 && letter != 10 && letter != 32)
+        {
+            letter = letter + 26;
+            if (debug == 1)
+            {
+                printAsChar(Letter + 26: , cha, letter); // More error checking
+            }
+        }
+
+        #include "reflector"
         if (debug == 1)
         {
             printAsChar(Letter after going through reflector: , cha, letter);
         }
 
-/*------------------------------------								 ------------------------------------*/
-/*------------------------------------*****Back through the Left-hand rotor*****--------------------------------*/
-/*------------------------------------								 ------------------------------------*/
+/*------------------------------------							------------------------------------*/
+/*------------------------------------*****Back through the Left-hand rotor*****--------------------*/
+/*------------------------------------							------------------------------------*/
 
 /*		if (turnover2 == 26)
 		{
 			++letter;
 			turnover2 = 0;
 		}*/
+        if (letter != 32 && letter != 10) //Changing letter based on offset3
+        {
+            letter+= offset3; // Changes letter based on offset3
+            if (debug == 1)
+            {
+                printAsChar(Letter + offset3: , cha, letter); // More error checking
+            }
+        }
+        if (letter > 90) // If the new value is greater than 90, take away 25 and tell me
+        {
+             letter = letter - 26;
+             if (debug == 1)
+             {
+                 printAsChar(Letter - 26: , cha, letter); // More error checking
+             }
+        }
 
-		switch (letter) {
-		case 'A':
-			letter = 'T';
-			break;
-		case 'B':
-			letter = 'A';
-			break;
-		case 'C':
-			letter = 'G';
-			break;
-		case 'D':
-			letter = 'B';
-			break;
-		case 'E':
-			letter = 'P';
-			break;
-		case 'F':
-			letter = 'C';
-			break;
-		case 'G':
-			letter = 'S';
-			break;
-		case 'H':
-			letter = 'D';
-			break;
-		case 'I':
-			letter = 'Q';
-			break;
-		case 'J':
-			letter = 'E';
-			break;
-		case 'K':
-			letter = 'U';
-			break;
-		case 'L':
-			letter = 'F';
-			break;
-		case 'M':
-			letter = 'V';
-			break;
-		case 'N':
-			letter = 'N';
-			break;
-		case 'O':
-			letter = 'Z';
-			break;
-		case 'P':
-			letter = 'H';
-			break;
-		case 'Q':
-			letter = 'Y';
-			break;
-		case 'R':
-			letter = 'I';
-			break;
-		case 'S':
-			letter = 'X';
-			break;
-		case 'T':
-			letter = 'J';
-			break;
-		case 'U':
-			letter = 'W';
-			break;
-		case 'V':
-			letter = 'L';
-			break;
-		case 'W':
-			letter = 'R';
-			break;
-		case 'X':
-			letter = 'K';
-			break;
-		case 'Y':
-			letter = 'O';
-			break;
-		case 'Z':
-			letter = 'M';
-			break;
-		default:
-			break;
-
-		}
+		#include "r3Back"
         if (debug == 1)
         {
             printAsChar(Letter after second time through left-hand rotor: , cha, letter);
         }
-
-/*------------------------------------								  ------------------------------------*/
+/*------------------------------------								         ------------------------------------*/
 /*------------------------------------*****Back through the Middle rotor*****------------------------------------*/
-/*------------------------------------								  ------------------------------------*/
-
-
-/*		if (turnover1 == 1)
+/*------------------------------------								         ------------------------------------*/
+        if (letter != 32 && letter != 10) //Changing letter based on offset3
+        {
+            letter-= offset3; // Changes letter based on offset3
+            if (debug == 1)
+            {
+                printAsChar(Letter - offset3: , cha, letter); // More error checking
+            }
+        }
+        if (letter < 65 && letter != 10 && letter != 32) //Makes sure the letter is not less than A
 		{
-			++letter;
-			turnover1 = 0;
-			++turnover2;
-		} */
-
-		switch (letter) {
-		case 'A':
-			letter = 'A';
-			break;
-		case 'B':
-			letter = 'J';
-			break;
-		case 'C':
-			letter = 'P';
-			break;
-		case 'D':
-			letter = 'C';
-			break;
-		case 'E':
-			letter = 'Z';
-			break;
-		case 'F':
-			letter = 'W';
-			break;
-		case 'G':
-			letter = 'R';
-			break;
-		case 'H':
-			letter = 'L';
-			break;
-		case 'I':
-			letter = 'F';
-			break;
-		case 'J':
-			letter = 'B';
-			break;
-		case 'K':
-			letter = 'D';
-			break;
-		case 'L':
-			letter = 'K';
-			break;
-		case 'M':
-			letter = 'O';
-			break;
-		case 'N':
-			letter = 'T';
-			break;
-		case 'O':
-			letter = 'Y';
-			break;
-		case 'P':
-			letter = 'U';
-			break;
-		case 'Q':
-			letter = 'Q';
-			break;
-		case 'R':
-			letter = 'G';
-			break;
-		case 'S':
-			letter = 'E';
-			break;
-		case 'T':
-			letter = 'N';
-			break;
-		case 'U':
-			letter = 'H';
-			break;
-		case 'V':
-			letter = 'X';
-			break;
-		case 'W':
-			letter = 'M';
-			break;
-		case 'X':
-			letter = 'I';
-			break;
-		case 'Y':
-			letter = 'V';
-			break;
-		case 'Z':
-			letter = 'S';
-			break;
-		default:
-			break;
+			letter = letter + 26;
+            if (debug == 1)
+            {
+                printAsChar(Letter + 26: , cha, letter); // More error checking
+            }
 		}
+
+        if (letter != 32 && letter != 10) //Changing letter based on offset2
+        {
+            letter+= offset2; // Changes letter based on offset2
+            if (debug == 1)
+            {
+                printAsChar(Letter + offset2: , cha, letter); // More error checking
+            }
+        }
+        if (letter > 90) // If the new value is greater than 90, take away 25 and tell me
+        {
+             letter = letter - 26;
+             if (debug == 1)
+             {
+                 printAsChar(Letter - 26: , cha, letter); // More error checking
+             }
+        }
+
+        /*if (turnover1 == 1)
+        {
+            ++letter;
+            turnover1 = 0;
+            ++turnover2;
+        } */
+        #include "r2Back"
+
+
         if (debug == 1)
         {
             printAsChar(Letter after second time through middle rotor: , cha, letter);
         }
 
-		if (letter != 32 && letter != 10) //According to Wikipedia, the Middle rotor was affected by the stepping as well. When the whole Right-hand rotor turned, the contacts changed. i.e. If the rotor stepped once, when A was pressed, it would go through the B path and become K. The K would go into the Middle rotor as J.
+        if (letter != 32 && letter != 10) //Changing letter based on offset2
+        {
+            letter-= offset2; // Changes letter based on offset2
+            if (debug == 1)
+            {
+                printAsChar(Letter - offset2: , cha, letter); // More error checking
+            }
+        }
+        if (letter < 65 && letter != 10 && letter != 32) //Makes sure the letter is not less than A
 		{
-         		letter = letter + timesStepped; // Changes letter based on timesStepped
-                if (debug == 1)
-                {
-                    printAsChar(Letter + timesStepped: , cha, letter); // More error checking
-                }
+			letter = letter + 26;
+            if (debug == 1)
+            {
+                printAsChar(Letter + 26: , cha, letter); // More error checking
+            }
 		}
 
-		if (letter > 90) // If the new value is greater than 90, take away 26 and tell me
+        if (letter != 32 && letter != 10) //According to Wikipedia, the Middle rotor was affected by the stepping as well. When the whole Right-hand rotor turned, the contacts changed. i.e. If the rotor stepped once, when A was pressed, it would go through the B path and become K. The K would go into the Middle rotor as J.
+        {
+            letter = letter + offset1; // Changes letter based on offset1
+            if (debug == 1)
+            {
+                printAsChar(Letter + offset1: , cha, letter); // More error checking
+            }
+        }
+
+        if (letter > 90) // If the new value is greater than 90, take away 26 and tell me
 		{
 		     letter = letter - 26;
              if (debug == 1)
@@ -755,9 +432,9 @@ int main()
             }
 		}
 
-/*------------------------------------								 ------------------------------------*/
+/*------------------------------------								        ------------------------------------*/
 /*------------------------------------*****Back through the Right-hand rotor*****-------------------------------*/
-/*------------------------------------								 ------------------------------------*/
+/*------------------------------------								        ------------------------------------*/
 
 		if (letter < 32 && letter != 10) // As long as the ASCII value of the character imputted is less than 32, and not equal to 10,
 	     {
@@ -766,107 +443,26 @@ int main()
 
 //		printf("letter %i", letter); // Value of letter is printed. This is for error checking.
 
-		switch (letter) {
-		case 'A':
-			letter = 'U';
-			break;
-		case 'B':
-			letter = 'W';
-			break;
-		case 'C':
-			letter = 'Y';
-			break;
-		case 'D':
-			letter = 'G';
-			break;
-		case 'E':
-			letter = 'A';
-			break;
-		case 'F':
-			letter = 'D';
-			break;
-		case 'G':
-			letter = 'F';
-			break;
-		case 'H':
-			letter = 'P';
-			break;
-		case 'I':
-			letter = 'V';
-			break;
-		case 'J':
-			letter = 'Z';
-			break;
-		case 'K':
-			letter = 'B';
-			break;
-		case 'L':
-			letter = 'E';
-			break;
-		case 'M':
-			letter = 'C';
-			break;
-		case 'N':
-			letter = 'K';
-			break;
-		case 'O':
-			letter = 'M';
-			break;
-		case 'P':
-			letter = 'T';
-			break;
-		case 'Q':
-			letter = 'H';
-			break;
-		case 'R':
-			letter = 'X';
-			break;
-		case 'S':
-			letter = 'S';
-			break;
-		case 'T':
-			letter = 'L';
-			break;
-		case 'U':
-			letter = 'R';
-			break;
-		case 'V':
-			letter = 'I';
-			break;
-		case 'W':
-			letter = 'N';
-			break;
-		case 'X':
-			letter = 'Q';
-			break;
-		case 'Y':
-			letter = 'O';
-			break;
-		case 'Z':
-			letter = 'J';
-			break;
-		default:
-			break;
-		}
+	#include "r1Back"
         if (debug == 1)
         {
             printAsChar(Letter after second time through right-hand rotor: , cha, letter);
         }
 
-/*------------------------------------				------------------------------------*/
+/*------------------------------------				   ------------------------------------*/
 /*------------------------------------*****Printer*****------------------------------------*/
-/*------------------------------------				------------------------------------*/
+/*------------------------------------				   ------------------------------------*/
 
 
 
-		if (letter > 90) // If the new value is greater than 90, take away 25 and tell me
+		/*if (letter > 90) // If the new value is greater than 90, take away 25 and tell me
 		{
 		     letter = letter - 26;
              if (debug == 1)
              {
                  printAsChar(Letter - 26: , cha, letter); // More error checking
              }
-		}
+		} */
 
 		if (letter < 65 && letter != 32 && letter != 10)
 		{
@@ -887,8 +483,9 @@ int main()
 
         if (letter != 10)
         {
-            letter-= timesStepped;
+            letter-= offset1;
         }
+
 		if (letter < 65 && letter != 10 && letter != 32)
 		{
 			letter = letter + 26;
@@ -899,12 +496,14 @@ int main()
 		}
         if (debug == 1)
         {
-            printAsChar(Letter - timesStepped:, cha, letter);
+            printAsChar(Letter - offset1:, cha, letter);
         }
         if (j != 1)
         {
             cha = letter; // the CHAR is equal to the value of letter, and this converts the ASCII back to a letter
             printf("%c", cha); // Print it
+            output[l] = cha;
+            ++l;
         }
         else printNl;
 
@@ -919,7 +518,6 @@ int main()
 		{
 			newline = letter;
             j = 1;
-			//letter = input[k];
 		}
         else if (letter == 32)
         {
@@ -931,6 +529,15 @@ int main()
         toUppercase(letter);
 
 	}
+
+    fp = fopen("output.txt", "a");
+    fprintf(fp, "\n==========================================================\n");
+    fprintf(fp, "%s", output);
+    fclose(fp);
+
+    /*printf("WARNING: All input and output will be deleted when you next run this program. Copy the file to a different location to save your data.\n"); */
+    printf("Enter any letter to close the program: \n");
+    i = getchar();
     return 0;
 
 }
@@ -940,11 +547,6 @@ int bgetline(char s[]){
 
 	for (i=0; i<MAXLENGTH-1 && (c=getchar()) !='$' && c!='\n'; ++i){
 		s[i] = c;
-        if (c == 32)
-        {
-            i++;
-            s[i] = c;
-        }
     }
 	if (c == '\n')
 	{
