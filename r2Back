@@ -1,0 +1,82 @@
+switch (letter) {
+case 'A':
+    letter = 'A';
+    break;
+case 'B':
+    letter = 'J';
+    break;
+case 'C':
+    letter = 'P';
+    break;
+case 'D':
+    letter = 'C';
+    break;
+case 'E':
+    letter = 'Z';
+    break;
+case 'F':
+    letter = 'W';
+    break;
+case 'G':
+    letter = 'R';
+    break;
+case 'H':
+    letter = 'L';
+    break;
+case 'I':
+    letter = 'F';
+    break;
+case 'J':
+    letter = 'B';
+    break;
+case 'K':
+    letter = 'D';
+    break;
+case 'L':
+    letter = 'K';
+    break;
+case 'M':
+    letter = 'O';
+    break;
+case 'N':
+    letter = 'T';
+    break;
+case 'O':
+    letter = 'Y';
+    break;
+case 'P':
+    letter = 'U';
+    break;
+case 'Q':
+    letter = 'Q';
+    break;
+case 'R':
+    letter = 'G';
+    break;
+case 'S':
+    letter = 'E';
+    break;
+case 'T':
+    letter = 'N';
+    break;
+case 'U':
+    letter = 'H';
+    break;
+case 'V':
+    letter = 'X';
+    break;
+case 'W':
+    letter = 'M';
+    break;
+case 'X':
+    letter = 'I';
+    break;
+case 'Y':
+    letter = 'V';
+    break;
+case 'Z':
+    letter = 'S';
+    break;
+default:
+    break;
+}
