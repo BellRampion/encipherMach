@@ -1,0 +1,64 @@
+When the program is run:
+    -Open the key settings file for appending
+    -Get the key setting for each rotor as user input
+        -convert it to uppercase
+        -record it in the file, one at a time
+        -calculate offset from key setting
+            -take the ASCII value of the key setting and subtract the value of uppercase A from it
+    -Get the plaintext from the user
+        -store it in an array
+    -Open the plaintext file for appending
+        -store the plaintext in the file
+    While the end of the array has not been reached,
+        -Send each letter of the plaintext through the rotors
+            -Convert it to uppercase
+            -If the first rotor's offset is less than 25, increase it by one
+                -else subtract 25 from it (reset it)
+            -Add the offset for the first rotor to the ASCII value of the letter
+            -If the new value of the letter is greater than 90 (ASCII value for Z), subtract 26 (loop back around the  alphabet)
+            -Send letter value through the actual wiring
+            -Subtract the offset for the first rotor from the letter value
+                -If the new letter value is less than 65 (value for A), add 26 (loop around the alphabet)
+            -Add the offset for the second rotor
+                -If the new value is greater than 90, subtract 26
+            -Send letter value through actual wiring for second rotor
+            -Subtract the offset for the second rotor from letter value
+                -If the new letter value is less than 65 (value for A), add 26 (loop around the alphabet)
+            -Add offset for third rotor
+                -If the new value is greater than 90, subtract 26
+            -Send letter value through the actual wiring for third rotor
+            -Subtract the third rotor's offset value
+                -If the new value is less than 65, add 26
+            -Send letter value through reflector
+            -Add offset for the third rotor
+                -If the new value is greater than 90, subtract 26
+            -Send letter value through the /back/ third rotor wiring (opposite of what first wiring was)
+            -Subtract the offset for third rotor
+                -If new value is less than 65, add 26
+            -Add offset for second rotor
+                -If new value is greater than 90, subtract 26
+            -Send letter value through the /back/ second rotor wiring (opposite of what first wiring was)
+            -Subtract the offset for the second rotor
+                -If the new value is less than 65, add 26
+            -Add the offset for the first rotor
+                -If the new value is greater than 90, subtract 26
+            -Send letter value through the /back/ first rotor wiring (opposite of what first wiring was)
+            -Subtract the offset for the first rotor
+                -If the new value is less than 65, add 26
+        -If the letter was not a newline,
+            -Print it
+            -Add it to an array
+        -Otherwise, print a newline
+        -Get the next letter of input
+        -Check to see if it's a newline
+            -If so, set a variable to 1 (TRUE)
+            -If not, see if it's a space
+                -If it's a space, set letter to 'X' and the variable to 0
+            -If not a space or a newline, set the variable to 0
+        -Convert the letter to uppercase
+    -Open output.txt
+    -Print a line to show a new message has started
+    -Print the array where the output was stored to the file
+    -Close the file
+    -Tell the user to enter a character to close the program
+    -Ask for a character of input (keeps program open--useful for Windows)
