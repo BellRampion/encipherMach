@@ -1,9 +1,8 @@
 #include <stdio.h>
 
-
 /*Each section of code, that for each rotor and the reflector, is separated by a long comment that informs the programmer which section they are about to enter.*/
 
-/*The right-hand rotor is currently Rotor I; the middle rotor, Rotor II; and the left-hand rotor, Rotor III. The Reflector is Reflector B, since that was the standard reflector.*/
+/*The right-hand rotor defaults to Rotor I; the middle rotor, Rotor II; and the left-hand rotor, Rotor III. The Reflector defaults to Reflector B, since that was the standard reflector.*/
 
 #define MAXLENGTH 10000
 #define printAsChar(expr, x, y) x = y; printf(#expr " %c\n", x);
@@ -12,8 +11,21 @@
                             { \
                                 c+= ('A' - 'a'); \
                             }
-int bgetline(char s[]);
 
+#define ROTORR rotor1 //Right-hand rotor
+#define ROTORM rotor2 //Middle rotor
+#define ROTORL rotor3 //Left-hand rotor
+#define REFLECTOR reflector //Reflector
+#define ROTORRBACK rotor1 ## "back" //Second set of code for right-hand rotor
+#define ROTORMBACK rotor2 ## "back" //Second set of code for middle rotor
+#define ROTORLBACK rotor2 ## "back" //Second set of code for left-hand rotor
+
+
+int bgetline(char s[]);
+int setRotors(char s[], char s2[], char s3[], char s4[]); //Sets the files to pull the rotor code from. Takes the rotor number and
+//arrays to put the name of each file in.
+
+int putNl = 0;
 int main()
 {
     //ints
@@ -33,6 +45,10 @@ int main()
     char cha; // A CHAR to convert the ASCII value to a letter
     char input[MAXLENGTH];
     char output[MAXLENGTH];
+    char rotor1[MAXLENGTH];
+    char rotor2[MAXLENGTH];
+    char rotor3[MAXLENGTH];
+    char reflector[MAXLENGTH];
 
     //FILEs
     FILE *fp;
@@ -54,9 +70,8 @@ int main()
     }
     else debug = 0;
 
-//    printf("Which rotor would you like as the right-hand rotor? (1, 2, or 3): ");
-//    i = getchar();
-//    printNl;
+    j = setRotors(rotor1, rotor2, rotor3, reflector);
+
 
     fp = fopen("key_settings.txt", "a"); //Opens a file for appending to add the key settings for this message
 
@@ -550,11 +565,60 @@ int bgetline(char s[]){
 	for (i=0; i<MAXLENGTH-1 && (c=getchar()) !='$' && c!='\n'; ++i){
 		s[i] = c;
     }
-	if (c == '\n')
+	if (c == '\n' && putNl == 1)
 	{
 		s[i] = c;
 		++i;
 	}
 	s[i] = '\0';
 	return i;
+}
+int setRotors(char s[], char s2[], char s3[], char s4[]){
+    int i;
+
+    printf("Which rotor would you like as the right-hand rotor? (1, 2, or 3) [1]: ");
+    i = getchar();
+    newline = getchar();
+
+    if (i == '1')
+    {
+        rotor1[0] = 'r'
+        rotor1[1] = '1'
+        rotor1[2] = '\0'
+    }
+    else if (i == '2')
+    {
+        rotor1[0] = 'r'
+        rotor1[1] = '2'
+        rotor1[2] = '\0'
+    }
+    else if (i == '3')
+    {
+        rotor1[0] = 'r'
+        rotor1[1] = '3'
+        rotor1[2] = '\0'
+    }
+    else
+    {
+        rotor1[0] = 'r'
+        rotor1[1] = '1'
+        rotor1[2] = '\0'
+    }
+
+    printf("Which rotor would you like as the middle rotor? (1, 2, or 3) [2]: ");
+    i = getchar();
+    newline = getchar();
+    printNl;
+
+    printf("Which rotor would you like as the left-hand rotor? (1, 2, or 3) [2]: ");
+    i = getchar();
+    newline = getchar();
+    printNl;
+
+    printf("Which reflector would you like to use? () [1]: ");
+    i = getchar();
+    newline = getchar();
+    printNl;
+
+    return 0;
 }
