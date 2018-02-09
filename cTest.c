@@ -17,8 +17,8 @@ int bgetline(char s[]);
 int main()
 {
     //ints
-	int letter; // The ASCII value of the key pressed
-	int offset1; // Offset for the first rotor (or times the rotor has moved one step forward)
+    int letter; // The ASCII value of the key pressed
+    int offset1; // Offset for the first rotor (or times the rotor has moved one step forward)
     int newline; //Catches the newlines
     int debug;
     int i, j, k, l;
@@ -31,6 +31,9 @@ int main()
 
     //chars
     char cha; // A CHAR to convert the ASCII value to a letter
+    char swap1; //To get letters to be swapped
+    char swap2;
+    char swap[26]; //For holding the letters to be swapped
     char input[MAXLENGTH];
     char output[MAXLENGTH];
 
@@ -40,10 +43,10 @@ int main()
 	offset1 = 0; // offset1 starts at 0
 	turnover1 = 0;
 	turnover2 = 0;
-    offset2 = 0;
-    offset3 = 0;
+	offset2 = 0;
+	offset3 = 0;
     debug = 0;
-    i = j = k = l = 0;
+    i = j = k = l = m = 0;
 
     printf("Would you like to turn debugging on? (y/n):\n ");
     debug = getchar();
@@ -83,11 +86,101 @@ int main()
     cha = i;
     fprintf(fp, "%c", cha);
     offset3 = i - 'A'; //Entering A will produce a offset1 of 0, entering B gives 1, and so on
-
+    
+    if (debug == 1)
+    {
+        printf("l: %i\n", l);
+        printf("swap1: %c\nswap2: %c\n", swap1, swap2);
+    }
+    //START SETTING PLUGBOARD
+    for (i = m = 0; m < 13 && swap1 != '$'; m++){ //m counts the number of times the loop has been run
+        printf("Set plugboard: Enter the two letters to be swapped (Enter '$' if you don't want to swap any more letters): ");
+        swap1 = getchar();
+        if (swap1 == '$')
+        {
+            if (debug == 1)
+                printf("'$' was entered.\n");
+            newline = getchar();
+            break;
+        }
+        swap2 = getchar();
+        newline = getchar();
+        
+        if (swap1 > 'a' && swap1 < 'z')
+        {
+            toUppercase(swap1);
+            if (debug == 1)
+            {
+                printf("Uppercase now: swap1. %c\n", swap1);
+            }
+        }
+        if (swap2 > 'a' && swap2 < 'z')
+        {
+            toUppercase(swap2);
+            if (debug == 1)
+            {
+                printf("Uppercase now: swap2. %c\n", swap2);
+            }
+        }
+        
+        if (debug == 1)
+        {
+            printf("swap1: %c\nswap2: %c\n", swap1, swap2);
+        }   
+        
+        if ((swap1 < 65) || (swap2 < 65))
+        {
+            printf("Please reenter both letters without separating them by a space or any other character.\n");
+            if (debug == 1)
+            {
+                printf("Swap1: %c\nSwap2: %c\n", swap1, swap2);
+            }
+            m--; //To counteract the increase that will happen when the loop is rerun
+            continue;
+            if (debug == 1)
+            {
+                printf("Swap list: %s\n", swap);
+                printf("Swap1: %c\nSwap2: %c\n", swap1, swap2);
+            }
+        } 
+        else if ((swap1 == 10) || (swap2 == 10))
+        {
+            printf("Try again.\n");
+            m--;
+            continue;
+        }
+        else if ((swap1 < 65) || (swap2 < 65) || (swap1 > 90) || (swap2 > 90)) 
+        {
+            printf("Sorry, I did not understand that.\n");
+            m--; //To counteract the increase that will happen when the loop is rerun
+            continue;
+        }
+        else 
+        {
+            swap[i++] = swap1;
+            swap[i++] = swap2;
+        }
+        /*if (debug == 1)
+        {
+            printf("Swap list: %s\n", swap);
+            printf("Swap1: %c\nSwap2: %c\n", swap1, swap2);
+        }*/
+    }
+    //END SETTING PLUGBOARD
+    if (debug == 1)
+    {
+        printf("Swap list: %s\n", swap);
+        printf("Swap1: %c\nSwap2: %c\n", swap1, swap2);
+    }
+    swap[i] = '\0';
+    fprintf(fp, "%s\n", swap);
     fclose(fp); //Closes key_settings
 
     if (debug == 1)
-        printf("Offset1: %i\n Offset2: %i\n Offset3: %i\n", offset1, offset2, offset3);
+    {
+        printf("Offset1: %i\nOffset2: %i\nOffset3: %i\n", offset1, offset2, offset3);
+        printf("Swapped letters: %s\n", swap);
+    }
 
 	printf("Enter $ to stop the program.\n");
     printf("Enter a letter or phrase. Press the Return key when done: ");
@@ -106,15 +199,44 @@ int main()
 	while (letter != '$' && letter != '\0') // While input is not equal to $, my EOF character
      {
 
+/*------------------------------------                   --------------------------------------*/
+/*------------------------------------*****Plugboard*****--------------------------------------*/     
+/*------------------------------------                   --------------------------------------*/
+         for (i = 0; i < 13 && swap[i] != '\0'; i++){
+            if (letter == swap[i])
+            {
+                if (debug == 1)
+                {
+                    printf("Letter before swap: %c\n", letter);
+                }
+                if (i % 2 != 0)
+                {
+                    letter = swap[i-1];
+                    if (debug == 1)
+                    {
+                        printf("i: %i\nLetter after swap: %c\n", i, letter);
+                    }
+                }
+                else letter = swap[i+1];
+                
+                if (debug == 1)
+                {
+                    printf("Letter after swapping: %c\n", letter);
+                }
+                break;
+            }
+        }
+
+
 /*------------------------------------					   ------------------------------------*/
 /*------------------------------------*****Right-hand rotor*****-----------------------------------*/
 /*------------------------------------					   ------------------------------------*/
 
 
-		if (letter < 32 && letter != 10) // As long as the ASCII value of the character imputted is less than 32, and not equal to 10,
+		/*if (letter < 32 && letter != 10) // As long as the ASCII value of the character imputted is less than 32, and not equal to 10,
 	     {
 			letter = 48; // the new ASCII character is the one with the value of 48
-		}
+		}*/
 
 
 //		printf("letter %i ", letter); // Value of letter is printed. This is for error checking.
@@ -164,7 +286,8 @@ int main()
             }
         }
 
-	#include "r1" //Includes wiring for first rotor
+	    #include "r1" //Includes wiring for first rotor
+        
         if (debug == 1)
         {
             printAsChar(Letter after first time through first rotor: , cha, letter);
@@ -448,23 +571,7 @@ int main()
         {
             printAsChar(Letter after second time through right-hand rotor: , cha, letter);
         }
-
-/*------------------------------------				   ------------------------------------*/
-/*------------------------------------*****Printer*****------------------------------------*/
-/*------------------------------------				   ------------------------------------*/
-
-
-
-		/*if (letter > 90) // If the new value is greater than 90, take away 25 and tell me
-		{
-		     letter = letter - 26;
-             if (debug == 1)
-             {
-                 printAsChar(Letter - 26: , cha, letter); // More error checking
-             }
-		} */
-
-		if (letter < 65 && letter != 32 && letter != 10)
+        if (letter < 65 && letter != 32 && letter != 10)
 		{
 			letter = letter + 26;
             if (debug == 1)
@@ -498,6 +605,88 @@ int main()
         {
             printAsChar(Letter - offset1:, cha, letter);
         }
+
+/*------------------------------------                   --------------------------------------*/
+/*------------------------------------*****Plugboard*****--------------------------------------*/     
+/*------------------------------------                   --------------------------------------*/
+         for (i = m = 0; m < 13 && swap1 != '$'; m++){ //m counts the number of times the loop has been run
+        printf("Set plugboard: Enter the two letters to be swapped (Enter '$' if you don't want to swap any more letters): ");
+        swap1 = getchar();
+        if (swap1 == '$')
+        {
+            if (debug == 1)
+                printf("'$' was entered.\n");
+            newline = getchar();
+            break;
+        }
+        swap2 = getchar();
+        newline = getchar();
+        
+        if (swap1 > 'a' && swap1 < 'z')
+        {
+            toUppercase(swap1);
+            if (debug == 1)
+            {
+                printf("Uppercase now: swap1. %c\n", swap1);
+            }
+        }
+        if (swap2 > 'a' && swap2 < 'z')
+        {
+            toUppercase(swap2);
+            if (debug == 1)
+            {
+                printf("Uppercase now: swap2. %c\n", swap2);
+            }
+        }
+        
+        if (debug == 1)
+        {
+            printf("swap1: %c\nswap2: %c\n", swap1, swap2);
+        }   
+        
+        if ((swap1 < 65) || (swap2 < 65))
+        {
+            printf("Please reenter both letters without separating them by a space or any other character.\n");
+            if (debug == 1)
+            {
+                printf("Swap1: %c\nSwap2: %c\n", swap1, swap2);
+            }
+            m--; //To counteract the increase that will happen when the loop is rerun
+            continue;
+            if (debug == 1)
+            {
+                printf("Swap list: %s\n", swap);
+                printf("Swap1: %c\nSwap2: %c\n", swap1, swap2);
+            }
+        } 
+        else if ((swap1 == 10) || (swap2 == 10))
+        {
+            printf("Try again.\n");
+            m--;
+            continue;
+        }
+        else if ((swap1 < 65) || (swap2 < 65) || (swap1 > 90) || (swap2 > 90)) 
+        {
+            printf("Sorry, I did not understand that.\n");
+            m--; //To counteract the increase that will happen when the loop is rerun
+            continue;
+        }
+        else 
+        {
+            swap[i++] = swap1;
+            swap[i++] = swap2;
+        }
+        /*if (debug == 1)
+        {
+            printf("Swap list: %s\n", swap);
+            printf("Swap1: %c\nSwap2: %c\n", swap1, swap2);
+        }*/
+    }
+
+/*------------------------------------				   ------------------------------------*/
+/*------------------------------------*****Printer*****------------------------------------*/
+/*------------------------------------				   ------------------------------------*/
+		
         if (j != 1)
         {
             cha = letter; // the CHAR is equal to the value of letter, and this converts the ASCII back to a letter
@@ -512,13 +701,13 @@ int main()
             printNl;
         }
 
-		letter = input[k];
+	letter = input[k];
         k++;
         if (letter == 10)
-		{
-			newline = letter;
+	{
+	    newline = letter;
             j = 1;
-		}
+	}
         else if (letter == 32)
         {
             spaces = letter;
@@ -528,10 +717,14 @@ int main()
 
         toUppercase(letter);
 
-	}
+    }
 
     fp = fopen("output.txt", "a");
     fprintf(fp, "\n==========================================================\n");
+    if (debug == 1)
+    {
+        printf("Output[]: %s\n", output);
+    }
     fprintf(fp, "%s", output);
     fclose(fp);
 
@@ -548,8 +741,8 @@ int bgetline(char s[]){
 	int c;
 
 	for (i=0; i<MAXLENGTH-1 && (c=getchar()) !='$' && c!='\n'; ++i){
-		s[i] = c;
-    }
+	    s[i] = c;
+        }
 	if (c == '\n')
 	{
 		s[i] = c;
