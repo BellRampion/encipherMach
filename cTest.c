@@ -21,7 +21,7 @@ int main()
     int offset1; // Offset for the first rotor (or times the rotor has moved one step forward)
     int newline; //Catches the newlines
     int debug;
-    int i, j, k, l;
+    int i, j, k, l, m;
     int spaces;
     int deftSet;
     int turnover1; //For the notches on the rotors
@@ -56,10 +56,6 @@ int main()
         debug = 1;
     }
     else debug = 0;
-
-//    printf("Which rotor would you like as the right-hand rotor? (1, 2, or 3): ");
-//    i = getchar();
-//    printNl;
 
     fp = fopen("key_settings.txt", "a"); //Opens a file for appending to add the key settings for this message
 
