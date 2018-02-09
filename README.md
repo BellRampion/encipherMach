@@ -6,3 +6,5 @@ Double-click the .exe file to run on Windows. cTest.c is the C code file. cTest 
 
 Input, output, and key settings are stored in files called input.txt, output.txt, and key_settings.txt. 
 Program requires r1, r2, r3, etc. to run. DO NOT delete those files. 
+
+The Windows .exe is not up-to-date. It works, but it does not include a plugboard. 
