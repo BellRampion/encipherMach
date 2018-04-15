@@ -17,17 +17,18 @@
 										; \
 									} 
 #define ctoi(c) i = (c -'0'); 
-										 	
+
+#define FILENAME filename										 	
 
 
-int bgetline(char s[]);
+int bgetline(char s[], int putNl);
 int rotorL(int letter, int lRotor, int debug); //Left-hand rotor
 int rotorM(int letter, int mRotor, int debug); //Middle rotor
 int rotorR(int letter, int rRotor, int debug); //Right-hand rotor
 
 int timeL; //Whether the value has gone through the left-hand rotor once or not
 int timeM; //Whether the value has gone through the middle rotor once or not
-int timeR; //Whether the value has gone through the right-hand rotor once or not
+int timeR; //Whether the value has gone through the right-hand rotor once or not 
 
 int main()
 {
@@ -47,6 +48,8 @@ int main()
     int mRotor; //Rotor used for the middle rotor
     int rRotor; //Rotor used for the right-hand rotor
     int call; //For calling functions
+    int max = MAXLENGTH;
+    int putNl;
 
     //chars
     char cha; // A CHAR to convert the ASCII value to a letter
@@ -55,9 +58,12 @@ int main()
     char swap[26]; //For holding the letters to be swapped
     char input[MAXLENGTH];
     char output[MAXLENGTH];
+    char filename[MAXLENGTH];
+    char fileline[MAXLENGTH];
 
     //FILEs
     FILE *fp;
+    FILE *fp2;
 
 	offset1 = 0; // offset1 starts at 0
 	turnover1 = 0;
@@ -224,13 +230,40 @@ int main()
         printf("Offset1: %i\n Offset2: %i\n Offset3: %i\n", offset1, offset2, offset3);
 
 	printf("Enter $ to stop the program.\n");
-    printf("Enter a letter or phrase. Press the Return key when done: ");
-
-    i = bgetline(input);
+	printf("To input from a file, enter f. Otherwise, press enter: \n");
+	letter = getchar();
+	if (letter != 10)
+	{
+	    newline = getchar();
+	}
+	if ((letter != 'f') && (letter != 'F'))
+	{
+        printf("Enter a letter or phrase. Press the Return key when done: ");
+        i = bgetline(input, putNl);
+    }
+    else {
+        printf("Enter the name of the file, including extensions: \n");
+        putNl = 0; //Sets it to false
+        i = bgetline(filename, putNl)
+        putNl = 1; //Back to true
+        fp2 = fopen(FILENAME, "r"); //Open the file
+        fgets(fileline, max, fp2); //Get a line from the file
+        for (m = 0; (fileline[m] != '\0') && m < MAXLENGTH-1; m++) //Copy the line to input
+            input[m] = fileline[m];
+        
+        input[m] = '\0';  
+    }
+    
     fp = fopen("input.txt", "a"); //Will record the input from the keyboard
     fprintf(fp, "\n==============================================================\n");
     fprintf(fp, "%s", input);
     fclose(fp);
+
+    /*i = bgetline(input, putNl)(input);
+    fp = fopen("input.txt", "a"); //Will record the input from the keyboard
+    fprintf(fp, "\n==============================================================\n");
+    fprintf(fp, "%s", input);
+    fclose(fp);*/
 
     letter = input[k]; // "letter" will receive input from the keyboard
     k++;
@@ -733,19 +766,19 @@ int main()
     fprintf(fp, "%s", output);
     fclose(fp);
 
-    printf("Enter any letter to close the program: \n");
+    printf("\nEnter any letter to close the program: \n");
     i = getchar();
     return 0;
 
 }
-int bgetline(char s[]){
+int bgetline(char s[], int putNl){
 	int i;
 	int c;
 
 	for (i=0; i<MAXLENGTH-1 && (c=getchar()) !='$' && c!='\n'; ++i){
 		s[i] = c;
     }
-	if (c == '\n')
+	if ((c == '\n') && (putNl == 1))
 	{
 		s[i] = c;
 		++i;
