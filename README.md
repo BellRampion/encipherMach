@@ -9,4 +9,5 @@ Double-click the engima.exe file to run on Windows. "enigma.c" is the C code fil
 Input, output, and key settings are stored in files called input.txt, output.txt, and key_settings.txt. 
 Program requires r1, r2, r3, etc. to run. DO NOT delete those files. 
 
+Now taking file input! Please make sure your file is compatible before feeding it to the program to avoid errors. No punctuation marks or other non-alphabet symbols are supported. 
 
