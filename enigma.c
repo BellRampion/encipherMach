@@ -21,6 +21,10 @@
                         { \
                             printf("%s %i\n", y, x);\
                         }
+#define strDebug(y, x) if (debug == 1) \
+                        { \
+                            printf("%s %s\n", y, x);\
+                        }
 #define ctoi(c) i = (c -'0');
 
 #define FILENAME filename
@@ -274,6 +278,7 @@ int main()
 
             input[m] = '\0';
         }
+        strDebug("input[]:", input)
         fp = fopen("input.txt", "a"); //Will record the input from the keyboard
         fprintf(fp, "==============================================================\n");
         fprintf(fp, "%s", input);
@@ -281,8 +286,7 @@ int main()
 
         k = 0; //k must be reset after each line
         l = 0; //And l, too
-        letter = input[k]; // "letter" will receive input from the keyboard
-        k++;
+        letter = input[k++]; // "letter" will receive input from the keyboard
         toUppercase(letter);
     //    printAsChar(,cha, letter);
 
@@ -756,8 +760,7 @@ int main()
                 printNl;
             }
 
-    		letter = input[k];
-            k++;
+    		letter = input[k++];
             if (letter == 10)
     		{
     			newline = letter;
@@ -773,8 +776,10 @@ int main()
             toUppercase(letter);
 
     	}
+    	output[l] = '\0';
 
         fp = fopen("output.txt", "a");
+        strDebug("Output string:", output);
         fprintf(fp, "==========================================================\n");
         fprintf(fp, "%s\n", output);
         fclose(fp);
