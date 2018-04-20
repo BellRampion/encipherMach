@@ -444,7 +444,9 @@ int main()
     			++turnover2;
     		} */
 
-    		#include "r2" //Includes the wiring for the 2nd rotor
+            //Sends the letter through the wiring
+    		letter = rotorM(letter, mRotor, debug);
+            timeM = 1;
             if (debug == 1)
             {
                 printAsChar(Letter after first time through middle rotor: , cha, letter);
@@ -494,8 +496,9 @@ int main()
     			turnover2 = 0;
     		} */
 
-    		#include "r3"
-
+            //Sends the letter through the wiring
+    		letter = rotorR(letter, rRotor, debug);
+            timeR = 1;
             if (debug == 1)
             {
                 printAsChar(Letter after first time through left-hand rotor: , cha, letter);
@@ -559,7 +562,8 @@ int main()
                  }
             }
 
-    		#include "r3Back"
+            //Sends the letter through the wiring
+    		letter = rotorR(letter, rRotor, debug);
             if (debug == 1)
             {
                 printAsChar(Letter after second time through left-hand rotor: , cha, letter);
@@ -607,7 +611,8 @@ int main()
                 turnover1 = 0;
                 ++turnover2;
             } */
-            #include "r2Back"
+            //Sends the letter through the wiring
+    		letter = rotorM(letter, mRotor, debug);
 
 
             if (debug == 1)
@@ -667,8 +672,6 @@ int main()
     	     {
     			letter = 48; // the new ASCII character is the one with the value of 48
     		}
-
-    //		printf("letter %i", letter); // Value of letter is printed. This is for error checking.
 
     		//Sends the letter through the wiring
     		letter = rotorL(letter, lRotor, debug);
@@ -874,6 +877,158 @@ int rotorL(int letter, int lRotor, int debug){
 			if (debug == 1)
 			{
 				printf("timeL: %i\nlRotor: %i\n", timeL, lRotor);
+				printf("Case default.\n");
+			}
+			break;
+		}
+	}
+	return letter;
+}
+int rotorM(int letter, int mRotor, int debug){
+	if (timeM != 1)
+	{
+		switch (mRotor){
+		case 1:
+			#include "r1"
+			if (debug == 1)
+			{
+				printf("timeM: %i\nmRotor: %i\n", timeM, mRotor);
+				printf("Case 1.\n");
+			}
+			break;
+		case 2:
+			#include "r2"
+			if (debug == 1)
+			{
+				printf("timeM: %i\nmRotor: %i\n", timeM, mRotor);
+				printf("Case 2.\n");
+			}
+			break;
+		case 3:
+			#include "r3"
+			if (debug == 1)
+			{
+				printf("timeM: %i\nmRotor: %i\n", timeM, mRotor);
+				printf("Case 3.\n");
+			}
+			break;
+		default:
+			#include "r1"
+			if (debug == 1)
+			{
+				printf("timeM: %i\nmRotor: %i\n", timeM, mRotor);
+				printf("Case default.\n");
+			}
+			break;
+		}
+	}
+	else {
+		switch (mRotor){
+		case 1:
+			#include "r1Back"
+			if (debug == 1)
+			{
+				printf("timeM: %i\nmRotor: %i\n", timeM, mRotor);
+				printf("Case 1.\n");
+			}
+			break;
+		case 2:
+			#include "r2Back"
+			if (debug == 1)
+			{
+				printf("timeM: %i\nmRotor: %i\n", timeM, mRotor);
+				printf("Case 2.\n");
+			}
+			break;
+		case 3:
+			#include "r3Back"
+			if (debug == 1)
+			{
+				printf("timeM: %i\nmRotor: %i\n", timeM, mRotor);
+				printf("Case 3.\n");
+			}
+			break;
+		default:
+			#include "r1Back"
+			if (debug == 1)
+			{
+				printf("timeM: %i\nmRotor: %i\n", timeM, mRotor);
+				printf("Case default.\n");
+			}
+			break;
+		}
+	}
+	return letter;
+}
+int rotorR(int letter, int rRotor, int debug){
+	if (timeR != 1)
+	{
+		switch (rRotor){
+		case 1:
+			#include "r1"
+			if (debug == 1)
+			{
+				printf("timeR: %i\nrRotor: %i\n", timeR, rRotor);
+				printf("Case 1.\n");
+			}
+			break;
+		case 2:
+			#include "r2"
+			if (debug == 1)
+			{
+				printf("timeR: %i\nrRotor: %i\n", timeR, rRotor);
+				printf("Case 2.\n");
+			}
+			break;
+		case 3:
+			#include "r3"
+			if (debug == 1)
+			{
+				printf("timeR: %i\nrRotor: %i\n", timeR, rRotor);
+				printf("Case 3.\n");
+			}
+			break;
+		default:
+			#include "r1"
+			if (debug == 1)
+			{
+				printf("timeR: %i\nrRotor: %i\n", timeR, rRotor);
+				printf("Case default.\n");
+			}
+			break;
+		}
+	}
+	else {
+		switch (rRotor){
+		case 1:
+			#include "r1Back"
+			if (debug == 1)
+			{
+				printf("timeR: %i\nrRotor: %i\n", timeR, rRotor);
+				printf("Case 1.\n");
+			}
+			break;
+		case 2:
+			#include "r2Back"
+			if (debug == 1)
+			{
+				printf("timeR: %i\nrRotor: %i\n", timeR, rRotor);
+				printf("Case 2.\n");
+			}
+			break;
+		case 3:
+			#include "r3Back"
+			if (debug == 1)
+			{
+				printf("timeR: %i\nrRotor: %i\n", timeR, rRotor);
+				printf("Case 3.\n");
+			}
+			break;
+		default:
+			#include "r1Back"
+			if (debug == 1)
+			{
+				printf("timeR: %i\nrRotor: %i\n", timeR, rRotor);
 				printf("Case default.\n");
 			}
 			break;
