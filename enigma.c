@@ -1,39 +1,48 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 
+/*THE ENIGMA MACHINE*/
+/*Created by Bailie Livingston.*/
 
-/*Each section of code, that for each rotor and the reflector, is separated by a header.*/
-
-/*The left-hand rotor is currently Rotor I; the middle rotor, Rotor II; and the right-hand rotor, Rotor III. The Reflector is Reflector B, since that was the standard reflector.*/
-
-#define MAXLENGTH 10000
-#define printAsChar(expr, x, y) x = y; printf(#expr " %c\n", x);
-#define printNl printf("\n")
-#define toUppercase(c) if (c >= 'a' && c <= 'z') \
-                            { \
-                                c+= ('A' - 'a'); \
-                            }
+#define ctoi(c) i = (c -'0');
 #define fileLength(fp, i, fileName, s) fp = fopen(fileName, "r"); \
 									for (i = 0; fgets(s, MAXLENGTH, fp) != NULL; i++){ \
 										; \
 									} \
                                     fclose(fp);
+#define FILENAME filename
+#define getFilename(filename, putNl) printf("Enter the name of the file, including extensions: \n"); \
+/*sets it to false*/    putNl = 0; \
+                        i = bgetline(filename, putNl); \
+                        putNl = 1; //Back to true
+#define INPUTSTORED inputStorage
 #define intDebug(y, x) if (debug == 1) \
                         { \
                             printf("%s %i\n", y, x);\
                         }
+#define MAXLENGTH 10000
+#define OUTPUTFILE outputFile
+#define printAsChar(expr, x, y) x = y; printf(#expr " %c\n", x);
+#define printNl printf("\n")
 #define strDebug(y, x) if (debug == 1) \
                         { \
                             printf("%s %s\n", y, x);\
                         }
-#define ctoi(c) i = (c -'0');
-
-#define FILENAME filename
-
+#define strCopy(s, s2) while(*s++ = *s2++){ \
+                                ; \
+                        }
+#define toUppercase(c) if (c >= 'a' && c <= 'z') \
+                        { \
+                            c+= ('A' - 'a'); \
+                        }
 
 int bgetline(char s[], int putNl);
+int fillArray(char options[], char filename[], int numLooped);
+int isOptionSet(char options[], char *option, FILE *fp, int *numLooped); //Takes the file and actually reads it. Returns 0 if a specific option isn't supposed to be set
 int rotorL(int letter, int lRotor, int debug); //Left-hand rotor
 int rotorM(int letter, int mRotor, int debug); //Middle rotor
 int rotorR(int letter, int rRotor, int debug); //Right-hand rotor
+int setOptions(char options[], char *option, int *option1, int *option2, char filename[], int *setOutputFile, char outputFile[], int *setInputStorage, char inputStorage[]); //Reads file and sets options. Takes the /address/ of option1, etc. instead of the value (shows as a pointer in the declaration). This allows the function to actually modify the variable.
+
 
 int timeL; //Whether the value has gone through the left-hand rotor once or not
 int timeM; //Whether the value has gone through the middle rotor once or not
@@ -42,74 +51,88 @@ int timeR; //Whether the value has gone through the right-hand rotor once or not
 int main()
 {
     //ints
-	int letter; // The ASCII value of the key pressed
-	int offset1; // Offset for the left-hand rotor (or times the rotor has moved one step forward)
-	int newline; //Catches the newlines
+    int call; //For calling functions
+    int countInput = 0; //Counting chars of input
     int debug;
-    int i, j, k, l, m; //Random vars to do whatever. NOTE: k is reserved! DO NOT use for anything except counting chars of input!
-    int spaces;
-    int deftSet;
-    int turnover1; //For the notches on the rotors
-    int turnover2; //For the notches on the rotors
+    int filelength = 0;
+    int fillOutput = 0; //Filling output[] for printing to a file
+    int i, j, k, l, m; //Random vars to do whatever.
+    int letter; // The ASCII value of the key pressed
+    int linesProcessed = 0;
+    int lRotor; //Rotor used for the left-hand rotor
+    int max = MAXLENGTH;
+    int mRotor; //Rotor used for the middle rotor
+    int newline; //Catches the newlines
+	int offset1; // Offset for the left-hand rotor (or times the rotor has moved one step forward)
     int offset2; //Offset for the middle rotor
     int offset3; //Offset for the right-hand rotor
-    int lRotor; //Rotor used for the left-hand rotor
-    int mRotor; //Rotor used for the middle rotor
-    int rRotor; //Rotor used for the right-hand rotor
-    int call; //For calling functions
-    int max = MAXLENGTH;
+    int optionsOn = 0;
     int putNl;
-    int filelength = 0;
-    int linesProcessed = 0;
+    int readFile = 0; //Option to read from file
+    int rRotor; //Rotor used for the right-hand rotor
+    int setInputStorage = 0;
+    int setOutputFile = 0;
+    int spaces;
+    int turnover1; //For the notches on the rotors
+    int turnover2; //For the notches on the rotors
 
     //chars
     char cha; // A CHAR to convert the ASCII value to a letter
     char swap1; //To get letters to be swapped
     char swap2;
-    char swap[26]; //For holding the letters to be swapped
-    char input[MAXLENGTH];
-    char output[MAXLENGTH];
-    char filename[MAXLENGTH];
     char fileline[MAXLENGTH];
+    char filename[MAXLENGTH];
+    char input[MAXLENGTH];
+    char inputStorage[MAXLENGTH];
+    char output[MAXLENGTH];
+    char outputFile[MAXLENGTH];
+    char options[MAXLENGTH];
+    char swap[26]; //For holding the letters to be swapped
+    char *option;
 
     //FILEs
     FILE *fp;
     FILE *fp2;
 
+    debug = 0;
 	offset1 = 0; // offset1 starts at 0
-	turnover1 = 0;
-	turnover2 = 0;
     offset2 = 0;
     offset3 = 0;
-    debug = 0;
+	turnover1 = 0;
+	turnover2 = 0;
     i = j = k = l = m = 0;
 
-    printf("Would you like to turn debugging on? (y/n):\n ");
-    debug = getchar();
-    newline = getchar();
-    if (debug == 'y')
+
+    printf("ENIGMA MACHINE\n");
+    printf("Enter h for help or enter to continue: ");
+    if ((i = getchar()) != '\n')
     {
-        debug = 1;
+        newline = getchar();
+        if (i == 'h')
+            printf("This program allows you to set options in a profile. To do this, create a file named \".enigmarc\" in the folder containing this program. In it, you can set four different options: \n1. Debugging\n2.Taking input from a file\n3.Piping the output to a file\n4.Recording the input in a file.\nSeparate each option by a ';' and place a ';' after the last option in a line. Up to %i characters on a line are supported.\n\nSome options take parameters. The optional parameters are indicated by square brackets.\n\n1. Debugging: debug\n2. Input from a file: input[=foo.txt]\n3. Piping output to a file: output[=foo.txt] No spaces are allowed in the filename. By default, output is stored in output.txt. If you don't want to record to a file at all, put the ';' immediately after the '=' e.g. \"output=; storeInput=input.txt;\".\n4. Recording input in a file: storeInput[=foo.txt] No spaces are allowed in the filename. By default, input is stored in input.txt. If you don't want to record to a file at all, put the ';' immediately after the '=' e.g. \"storeInput=; debug;\".\n", MAXLENGTH);
     }
-    else debug = 0;
+    call = setOptions(options, option, &debug, &readFile, filename, &setOutputFile, outputFile, &setInputStorage, inputStorage);
 
 	printf("Choose the rotor to put in the left-hand slot: (1, 2, or 3) [1]\n");
-	cha = getchar();
-	newline = getchar();
+	if ((cha = getchar()) != '\n')
+        newline = getchar();
+    else cha = '1';
 	lRotor = ctoi(cha);
 	if (debug == 1)
 		printf("The converted rotor number: %i\n", lRotor);
 
 	printf("Choose the rotor to put in the middle slot: (1, 2, or 3) [2]\n");
-	cha = getchar();
-	newline = getchar();
+    if ((cha = getchar()) != '\n')
+        newline = getchar();
+    else cha = '2';
 	mRotor = ctoi(cha);
 	if (debug == 1)
 		printf("The converted rotor number: %i\n", mRotor);
 
 	printf("Choose the rotor to put in the right-hand slot: (1, 2, or 3) [3]\n");
-	cha = getchar();
-	newline = getchar();
+    if ((cha = getchar()) != '\n')
+        newline = getchar();
+    else cha = '3';
 	rRotor = ctoi(cha);
 	if (debug == 1)
 		printf("The converted rotor number: %i\n", rRotor);
@@ -220,11 +243,6 @@ int main()
             swap[i++] = swap1;
             swap[i++] = swap2;
         }
-        /*if (debug == 1)
-        {
-            printf("Swap list: %s\n", swap);
-            printf("Swap1: %c\nSwap2: %c\n", swap1, swap2);
-        }*/
     }
     //END SETTING PLUGBOARD
     if (debug == 1)
@@ -241,23 +259,13 @@ int main()
         printf("Offset1: %i\n Offset2: %i\n Offset3: %i\n", offset1, offset2, offset3);
 
 	printf("Enter $ to stop the program.\n");
-	printf("To input from a file, enter f. Otherwise, press enter: \n");
-	letter = getchar();
-	if (letter != 10)
-	{
-	    newline = getchar();
-	}
-	if ((letter != 'f') && (letter != 'F'))
-	{
-        printf("Enter a letter or phrase. Press the Return key when done: ");
-        i = bgetline(input, putNl);
-        filelength = 1;
-    }
-    else {
-        printf("Enter the name of the file, including extensions: \n");
-        putNl = 0; //Sets it to false
-        i = bgetline(filename, putNl);
-        putNl = 1; //Back to true
+
+    if (readFile == 1)
+    {
+        if (filename[0] == '\0')
+        {
+            getFilename(filename, putNl);
+        }
         fileLength(fp2, filelength, filename, fileline);
         intDebug("Length of file:", filelength);
         fp2 = fopen(FILENAME, "r"); //Open the file
@@ -267,6 +275,13 @@ int main()
 
         input[m] = '\0';
     }
+    else
+	{
+        printf("Enter a letter or phrase. Press the Return key when done: ");
+        i = bgetline(input, putNl);
+        filelength = 1;
+    }
+
     for (linesProcessed = 0; linesProcessed < filelength; linesProcessed++){ //This lets you do multiple lines of a file in one go instead of rerunning the program each time.
 
         intDebug("linesProcessed:", linesProcessed);
@@ -279,14 +294,27 @@ int main()
             input[m] = '\0';
         }
         strDebug("input[]:", input)
-        fp = fopen("input.txt", "a"); //Will record the input from the keyboard
-        fprintf(fp, "==============================================================\n");
-        fprintf(fp, "%s", input);
-        fclose(fp);
+        if (setInputStorage == 1)
+        {
+            if (inputStorage[0] == '\n')
+            {
+                strDebug("inputStorage:", inputStorage);
+                getFilename(inputStorage, putNl);
+            }
+            fp = fopen(INPUTSTORED, "a");
+        }
+        else if (setInputStorage == 0)
+        {
+            fp = fopen("input.txt", "a"); //Will record the input from the keyboard
+            fprintf(fp, "==============================================================\n");
+            fprintf(fp, "%s", input);
+            fclose(fp);
+        }
+        else ;
 
-        k = 0; //k must be reset after each line
-        l = 0; //And l, too
-        letter = input[k++]; // "letter" will receive input from the keyboard
+        countInput = 0; //countInput must be reset after each line
+        fillOutput = 0; //And fillOutput, too
+        letter = input[countInput++]; // "letter" will receive input from the keyboard
         toUppercase(letter);
     //    printAsChar(,cha, letter);
 
@@ -568,9 +596,9 @@ int main()
             {
                 printAsChar(Letter after second time through left-hand rotor: , cha, letter);
             }
-    /*------------------------------------								         ------------------------------------*/
-    /*------------------------------------*****Back through the Middle Rotor*****------------------------------------*/
-    /*------------------------------------								         ------------------------------------*/
+    /*------------------------------------								       ------------------------------------*/
+    /*----------------------------------*****Back through the Middle Rotor*****------------------------------------*/
+    /*------------------------------------								       ------------------------------------*/
             if (letter != 32 && letter != 10) //Changing letter based on offset3
             {
                 letter-= offset3; // Changes letter based on offset3
@@ -664,9 +692,9 @@ int main()
                 }
     		}
 
-    /*------------------------------------								        ------------------------------------*/
+    /*------------------------------------								       ------------------------------------*/
     /*------------------------------------*****Back through the Left-hand Rotor*****-------------------------------*/
-    /*------------------------------------								        ------------------------------------*/
+    /*------------------------------------								       ------------------------------------*/
 
     		if (letter < 32 && letter != 10) // As long as the ASCII value of the character imputted is less than 32, and not equal to 10,
     	     {
@@ -754,7 +782,7 @@ int main()
             {
                 cha = letter; // the CHAR is equal to the value of letter, and this converts the ASCII back to a letter
                 printf("%c", cha); // Print it
-                output[l++] = cha;
+                output[fillOutput++] = cha;
             }
             else printNl;
 
@@ -763,7 +791,8 @@ int main()
                 printNl;
             }
 
-    		letter = input[k++];
+    		letter = input[countInput++];
+
             if (letter == 10)
     		{
     			newline = letter;
@@ -779,9 +808,19 @@ int main()
             toUppercase(letter);
 
     	}
-    	output[l] = '\0';
+    	output[fillOutput] = '\0';
 
-        fp = fopen("output.txt", "a");
+        if (setOutputFile == 1)
+        {
+            if (outputFile[0] == '\n')
+            {
+                strDebug("outputFile:", outputFile);
+                getFilename(outputFile, putNl);
+            }
+            fp = fopen(OUTPUTFILE, "a");
+        }
+        else fp = fopen("output.txt", "a");
+
         strDebug("Output string:", output);
         fprintf(fp, "==========================================================\n");
         fprintf(fp, "%s\n", output);
@@ -1035,4 +1074,183 @@ int rotorR(int letter, int rRotor, int debug){
 		}
 	}
 	return letter;
+}
+int setOptions(char options[], char *option, int *option1, int *option2, char filename[], int *setOutputFile, char outputFile[], int *setInputStorage, char inputStorage[]){
+
+    int i, numLooped, k;
+    i = numLooped = k = 0;
+
+    FILE *fp;
+
+    if ((fp = fopen(".enigmarc", "r")) == NULL)
+    {
+        fprintf(stderr, "Options file does not exist. Please create a file named \".enigmarc\" in the folder containing this program. Leave it blank if you wish. \n");
+        return -1;
+    }
+    else
+    {   //Choose to turn on debugging
+        option = "debug";
+        i = isOptionSet(options, option, fp, &numLooped);
+    //    printf("Got through the next function.\n");
+        if (i == 1)
+        {
+            *option1 = 1;
+        }
+        else *option1 = 0;
+        fclose(fp);
+
+        fp = fopen(".enigmarc", "r");
+
+        //Choose reading from a file
+        //Since it already checked to see if .enigmarc exists, it doesn't check again
+        option = "input";
+        i = isOptionSet(options, option, fp, &numLooped);
+    //    printf("Got through the next function.\n");
+        if (i == 1)
+        {
+            *option2 = 1;
+            filename[0] = '\0';
+        }
+        else if (i == 2)
+        {
+            *option2 = 1;
+            fillArray(options, filename, numLooped);
+        }
+        else *option2 = 0;
+        fclose(fp);
+        //Choose where to store the output
+        fp = fopen(".enigmarc", "r");
+        option = "output";
+        i = isOptionSet(options, option, fp, &numLooped);
+    //    printf("Got through the next function.\n");
+        if (i == 1)
+        {
+            *setOutputFile = 1;
+            outputFile[0] = '\n';
+        }
+        else if (i == 2)
+        {
+            *setOutputFile = 1;
+            fillArray(options, outputFile, numLooped);
+        }
+        else if (i == 3)
+        {
+            outputFile[0] = '\0';
+        }
+        else *setOutputFile = 0;
+        fclose(fp);
+        //Choose where to store the input string(s)
+        fp = fopen(".enigmarc", "r");
+        option = "storeInput";
+        i = isOptionSet(options, option, fp, &numLooped);
+    //    printf("Got through the next function.\n");
+        if (i == 1)
+        {
+            *setInputStorage = 1;
+            inputStorage[0] = '\n';
+        }
+        else if (i == 2)
+        {
+            *setInputStorage = 1;
+            fillArray(options, inputStorage, numLooped);
+        }
+        else if (i == 3)
+        {
+            inputStorage[0] = '\0';
+        }
+        else *setInputStorage = 0;
+        fclose(fp);
+    }
+    return 1;
+}
+int isOptionSet(char options[], char *option, FILE *fp, int *numLooped){
+    int i, k, max;
+
+    i = *numLooped = k = 0;
+    max = MAXLENGTH;
+
+    char *p; //Pointer to handle the options array
+    char *optionStored; //Pointer to remember what the string was so that *option can be reset
+
+
+    p = options; //p points to the first char of options[]
+    optionStored = option; //Both now point to the string *option points to
+    //printf("Assigned pointers.\n");
+
+    for (i = 0; fgets(options, max, fp) != NULL; i++){ //Start by opening the file and making sure that there is something in it
+    //    printf("Got first line of file.");
+        for (*numLooped = 0; *p != '\0'; p++){ //Makes sure the end of the string has not been reached
+            if (*p == 32)
+            {
+                *numLooped += 1; //Increment numLooped to say it looped again.
+                continue; //Skip whitespace
+            }
+            if (*p == *option) //If the current character matches the current char in option,
+            {
+                //printf("It matches so far.\n");
+                if ((*(p +1) != ';') && (*(p +1) != '\n') && (*(option +1) != '\0') && (*(p +1) != '=')) //And if the end of either string hasn't been reached, or the end of an option, or an equals sign
+                {
+                //    printf("Keep on trying.\n");
+                    option++; //Advance to the next character in option. p is advanced at the beginning of the loop.
+                    *numLooped += 1; //Increment numLooped to say it looped again
+                //    printf("Times looped: %i\n", *numLooped);
+                    continue;
+                }
+                else if (*(p +1) == ';')
+                {
+                //    printf("Reached the ';'.\n");
+                    *numLooped += 1; //Increment numLooped to say it looped again.
+                    return 1;
+                }
+                else if (*(p +1) == '=') //If it reached a '=', something specific is going to follow
+                {
+                    //printf("Reached the '='.\n");
+                    *numLooped += 1; //Increment numLooped to say it looped again.
+                    if (*(p +2) == ';')
+                    {
+                        return 3; //Tell the caller
+                    }
+                    else return 2; //Tell caller that a name was specified
+                }
+                else if (*(p +1) == '\n') //If the end of p has been reached, we are out of options on that line, so go back to the parent loop and get the next line. There will be a newline on the end of p right before the '\0', so check for that instead
+                {
+                    //printf("Reached the end of p.\n");
+                    option = optionStored; //Resets *option to keep trying
+                    *numLooped += 1; //Increment numLooped to say it looped again
+                    break;
+                }
+                else if (*(option +1) == '\0') //If the end of *option has been reached, we just need to reset option and try again.
+                {
+                    //printf("Went through all of option. Resetting.\n");
+                    option = optionStored; //Resets *option to keep trying
+                    continue;
+                }
+                else return 0; //Should never happen, but this is required.
+            }
+            else
+            {
+                //printf("Didn't match at all. Going to next option.\n");
+                while ((*p != ';') && (*p != '\0')){ //While the next option hasn't been reached and the end of the string hasn't been reached
+                    p++; //Skip ahead to the next option
+                    *numLooped += 1; //Increment numLooped to say it looped again.
+                    //printf("Times looped: %i\n", *numLooped);
+                    //The ';' will be skipped when *p is incremented at the start of the loop.
+                }
+                *numLooped += 1; //Increment numLooped to say it looped again. numLooped isn't incremented at the start of the loop, so it will get behind p.
+            }
+        }
+
+    }
+    return 0;
+}
+int fillArray(char options[], char filename[], int numLooped){
+    int i = 0;
+
+    numLooped += 1; //numLooped needs to move ahead two in order to skip the '=' and the character preceeding it. Because of the way the loop worked in isOptionSet, it will still be at the ='.
+    for (i = 0; (options[numLooped] != '\0') && (options[numLooped] != ';') && (i != MAXLENGTH); i++){
+    //printf("numLooped: %i\noptions[numLooped]: %c\n", numLooped, options[numLooped]);
+        filename[i] = options[numLooped++];
+    }
+    return i;
+
 }
