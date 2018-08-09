@@ -3,7 +3,22 @@
 /*THE ENIGMA MACHINE*/
 /*Created by Bailie Livingston.*/
 
+#define charDebug(x, y) if (debug == 1) \
+                        { \
+                            if (fileDebug != 1) /*This cannot be done as an ifdef because those can't be inside macro definitions*/ \
+                            { \
+                                printf("%s %c\n", x, y); \
+                            } \
+                            else \
+                            { \
+                                fprintf(debuggingFile, "%s %c\n", x, y); \
+                            } \
+                        }
+
 #define ctoi(c) i = (c -'0');
+
+#define DEBUGGINGFILE debugFile
+
 #define fileLength(fp, i, fileName, s) fp = fopen(fileName, "r"); \
 									for (i = 0; fgets(s, MAXLENGTH, fp) != NULL; i++){ \
 										; \
@@ -15,21 +30,35 @@
                         i = bgetline(filename, putNl); \
                         putNl = 1; //Back to true
 #define INPUTSTORED inputStorage
-#define intDebug(y, x) if (debug == 1) \
+#define intDebug(x, y) if (debug == 1) \
                         { \
-                            printf("%s %i\n", y, x);\
+                            if (fileDebug != 1) /*This cannot be done as an ifdef because those can't be inside macro definitions*/ \
+                            { \
+                                printf("%s %i\n", x, y); \
+                            } \
+                            else \
+                            { \
+                                fprintf(debuggingFile, "%s %i\n", x, y); \
+                            } \
                         }
 #define MAXLENGTH 10000
 #define OUTPUTFILE outputFile
-#define printAsChar(expr, x, y) x = y; printf(#expr " %c\n", x);
 #define printNl printf("\n")
-#define strDebug(y, x) if (debug == 1) \
+#define strDebug(x, y) if (debug == 1) \
                         { \
-                            printf("%s %s\n", y, x);\
+                            if (fileDebug != 1) /*This cannot be done as an ifdef because those can't be inside macro definitions*/ \
+                            { \
+                                printf("%s %s\n", x, y); \
+                            } \
+                            else \
+                            { \
+                                fprintf(debuggingFile, "%s %s\n", x, y); \
+                            } \
                         }
 #define strCopy(s, s2) while(*s++ = *s2++){ \
                                 ; \
                         }
+#define toChar(x, y) x = y
 #define toUppercase(c) if (c >= 'a' && c <= 'z') \
                         { \
                             c+= ('A' - 'a'); \
@@ -41,12 +70,14 @@ int isOptionSet(char options[], char *option, FILE *fp, int *numLooped); //Takes
 int rotorL(int letter, int lRotor, int debug); //Left-hand rotor
 int rotorM(int letter, int mRotor, int debug); //Middle rotor
 int rotorR(int letter, int rRotor, int debug); //Right-hand rotor
-int setOptions(char options[], char *option, int *option1, int *option2, char filename[], int *setOutputFile, char outputFile[], int *setInputStorage, char inputStorage[]); //Reads file and sets options. Takes the /address/ of option1, etc. instead of the value (shows as a pointer in the declaration). This allows the function to actually modify the variable.
+int setOptions(char options[], char *option, int *option1, char debugFile[], int *option2, char filename[], int *setOutputFile, char outputFile[], int *setInputStorage, char inputStorage[]); //Reads file and sets options. Takes the /address/ of option1, etc. instead of the value (shows as a pointer in the declaration). This allows the function to actually modify the variable.
 
-
+int fileDebug = 0; //To debug into a file or not
 int timeL; //Whether the value has gone through the left-hand rotor once or not
 int timeM; //Whether the value has gone through the middle rotor once or not
 int timeR; //Whether the value has gone through the right-hand rotor once or not
+char debugFile[MAXLENGTH]; //Filename to debug into
+FILE *debuggingFile; //Pointer to the debugging file
 
 int main()
 {
@@ -109,33 +140,44 @@ int main()
     {
         newline = getchar();
         if (i == 'h')
-            printf("This program allows you to set options in a profile. To do this, create a file named \".enigmarc\" in the folder containing this program. In it, you can set four different options: \n1. Debugging\n2.Taking input from a file\n3.Piping the output to a file\n4.Recording the input in a file.\nSeparate each option by a ';' and place a ';' after the last option in a line. Up to %i characters on a line are supported.\n\nSome options take parameters. The optional parameters are indicated by square brackets.\n\n1. Debugging: debug\n2. Input from a file: input[=foo.txt]\n3. Piping output to a file: output[=foo.txt] No spaces are allowed in the filename. By default, output is stored in output.txt. If you don't want to record to a file at all, put the ';' immediately after the '=' e.g. \"output=; storeInput=input.txt;\".\n4. Recording input in a file: storeInput[=foo.txt] No spaces are allowed in the filename. By default, input is stored in input.txt. If you don't want to record to a file at all, put the ';' immediately after the '=' e.g. \"storeInput=; debug;\".\n", MAXLENGTH);
+            printf("This program allows you to set options in a profile. To do this, create a file named \".enigmarc\" in the folder containing this program. In it, you can set four different options: \n1. Debugging\n2.Taking input from a file\n3.Piping the output to a file\n4.Recording the input in a file.\nSeparate each option by a ';' and place a ';' after the last option in a line. Up to %i characters on a line are supported.\n\nSome options take parameters. The optional parameters are indicated by square brackets.\n\n1. Debugging: debug[=foo.txt] If you don't want to record to a file, put the ';' immediately after the '=' e.g. \"debug=;\". \n2. Input from a file: input[=foo.txt]\n3. Piping output to a file: output[=foo.txt] No spaces are allowed in the filename. By default, output is stored in output.txt. If you don't want to record to a file at all, put the ';' immediately after the '=' e.g. \"output=; storeInput=input.txt;\".\n" "4. Recording input in a file: storeInput[=foo.txt] No spaces are allowed in the filename. By default, input is stored in input.txt. If you don't want to record to a file at all, put the ';' immediately after the '=' e.g. \"storeInput=; debug;\".\n\n", MAXLENGTH);
     }
-    call = setOptions(options, option, &debug, &readFile, filename, &setOutputFile, outputFile, &setInputStorage, inputStorage);
+    call = setOptions(options, option, &debug, debugFile, &readFile, filename, &setOutputFile, outputFile, &setInputStorage, inputStorage); //Takes an array to get the lines from the config file, a pointer for holding the current option, the address of debug, an array for the debug output filename, the address of readFile, setOutputFile, and setInputstorage, an array for the filename, an array for the output file's name, and an array for the input storage file's name.
+
+    if (debug == 1)
+    {
+        debuggingFile = fopen("debuggingOutput.txt", "a");
+        fprintf(debuggingFile, "==New runthrough==\n");
+        fileDebug = 1;
+    }
+    else if (debug == 2)
+    {
+        debuggingFile = fopen(DEBUGGINGFILE, "a");
+        fprintf(debuggingFile, "==New runthrough==\n");
+        fileDebug = 1;
+    }
+    else ;
 
 	printf("Choose the rotor to put in the left-hand slot: (1, 2, or 3) [1]\n");
 	if ((cha = getchar()) != '\n')
         newline = getchar();
     else cha = '1';
 	lRotor = ctoi(cha);
-	if (debug == 1)
-		printf("The converted rotor number: %i\n", lRotor);
+	intDebug("The converted rotor number: ", lRotor);
 
 	printf("Choose the rotor to put in the middle slot: (1, 2, or 3) [2]\n");
     if ((cha = getchar()) != '\n')
         newline = getchar();
     else cha = '2';
 	mRotor = ctoi(cha);
-	if (debug == 1)
-		printf("The converted rotor number: %i\n", mRotor);
+	intDebug("The converted rotor number: ", mRotor);
 
 	printf("Choose the rotor to put in the right-hand slot: (1, 2, or 3) [3]\n");
     if ((cha = getchar()) != '\n')
         newline = getchar();
     else cha = '3';
 	rRotor = ctoi(cha);
-	if (debug == 1)
-		printf("The converted rotor number: %i\n", rRotor);
+	intDebug("The converted rotor number: ", rRotor);
 
     fp = fopen("key_settings.txt", "a"); //Opens a file for appending to add the key settings for this message
 
@@ -163,11 +205,10 @@ int main()
     fprintf(fp, "%c", cha);
     offset3 = i - 'A'; //Entering A will produce a offset1 of 0, entering B gives 1, and so on
 
-    if (debug == 1)
-    {
-        printf("l: %i\n", l);
-        printf("swap1: %c\nswap2: %c\n", swap1, swap2);
-    }
+    intDebug("l: ", l);
+    charDebug("swap1:", swap1);
+    charDebug("swap2: ", swap2);
+
 
     //START SETTING PLUGBOARD
     for (i = m = 0; m < 13 && swap1 != '$'; m++){ //m counts the number of times the loop has been run
@@ -175,8 +216,7 @@ int main()
         swap1 = getchar();
         if (swap1 == '$')
         {
-            if (debug == 1)
-                printf("'$' was entered.\n");
+            strDebug("'$' was entered.", "\n");
             newline = getchar();
             break;
         }
@@ -192,39 +232,24 @@ int main()
         if (swap1 > 'a' && swap1 < 'z')
         {
             toUppercase(swap1);
-            if (debug == 1)
-            {
-                printf("Uppercase now: swap1. %c\n", swap1);
-            }
+            charDebug("Uppercase now: swap1.", swap1);
         }
         if ((swap2 > 'a') && (swap2 < 'z'))
         {
             toUppercase(swap2);
-            if (debug == 1)
-            {
-                printf("Uppercase now: swap2. %c\n", swap2);
-            }
+            charDebug("Uppercase now: swap2.", swap2);
         }
 
-        if (debug == 1)
-        {
-            printf("swap1: %c\nswap2: %c\n", swap1, swap2);
-        }
+        charDebug("swap1:", swap1);
+        charDebug("swap2: ", swap2);
 
         if ((swap1 < 65) || (swap2 < 65))
         {
             printf("Please reenter both letters without separating them by a space or any other character.\n");
-            if (debug == 1)
-            {
-                printf("Swap1: %c\nSwap2: %c\n", swap1, swap2);
-            }
+            charDebug("swap1:", swap1);
+            charDebug("swap2: ", swap2);
             m--; //To counteract the increase that will happen when the loop is rerun
             continue;
-            if (debug == 1)
-            {
-                printf("Swap list: %s\n", swap);
-                printf("Swap1: %c\nSwap2: %c\n", swap1, swap2);
-            }
         }
         else if ((swap1 == 10) || (swap2 == 10))
         {
@@ -245,18 +270,18 @@ int main()
         }
     }
     //END SETTING PLUGBOARD
-    if (debug == 1)
-    {
-        printf("Swap list: %s\n", swap);
-        printf("Swap1: %c\nSwap2: %c\n", swap1, swap2);
-    }
+    strDebug("Swap list: ", swap);
+    charDebug("swap1:", swap1);
+    charDebug("swap2: ", swap2);
+
     swap[i] = '\0';
     fprintf(fp, "%s\n", swap);
 
     fclose(fp); //Closes key_settings
 
-    if (debug == 1)
-        printf("Offset1: %i\n Offset2: %i\n Offset3: %i\n", offset1, offset2, offset3);
+    intDebug("Offset1: ", offset1);
+    intDebug("Offset2: ", offset2);
+    intDebug("Offset3: ", offset3);
 
 	printf("Enter $ to stop the program.\n");
 
@@ -293,22 +318,34 @@ int main()
 
             input[m] = '\0';
         }
-        strDebug("input[]:", input)
+        strDebug("input[]:", input);
         if (setInputStorage == 1)
         {
-            if (inputStorage[0] == '\n')
+            if (inputStorage[0] == '\n') //If the first character is a newline, that means the user wished to specify the filename during runtime
             {
                 strDebug("inputStorage:", inputStorage);
-                getFilename(inputStorage, putNl);
+                getFilename(inputStorage, putNl); //Get filename from user
             }
-            fp = fopen(INPUTSTORED, "a");
+            fp = fopen(INPUTSTORED, "a"); //Either way, open the file defined as INPUTSTORED for appending
+            if (linesProcessed == 0)
+            {
+                fprintf(fp, "\n==============================================================\n");
+            }
+            fprintf(fp, "%s", input);
+            fclose(fp);
         }
         else if (setInputStorage == 0)
         {
-            fp = fopen("input.txt", "a"); //Will record the input from the keyboard
-            fprintf(fp, "==============================================================\n");
-            fprintf(fp, "%s", input);
-            fclose(fp);
+            if (inputStorage[0] != '\0')
+            {
+                fp = fopen("input.txt", "a"); //Will record the input from the keyboard
+                if (linesProcessed == 0)
+                {
+                    fprintf(fp, "\n==============================================================\n");
+                }
+                fprintf(fp, "%s", input);
+                fclose(fp);
+            }
         }
         else ;
 
@@ -316,7 +353,6 @@ int main()
         fillOutput = 0; //And fillOutput, too
         letter = input[countInput++]; // "letter" will receive input from the keyboard
         toUppercase(letter);
-    //    printAsChar(,cha, letter);
 
         while (letter != '$' && letter != '\0') // While input is not equal to $, my EOF character
          {
@@ -338,17 +374,12 @@ int main()
                     if (i % 2 != 0)
                     {
                         letter = swap[i-1];
-                        if (debug == 1)
-                        {
-                            printf("i: %i\nLetter after swap: %c\n", i, letter);
-                        }
+                        intDebug("i:", i);
+                        charDebug("Letter after swap: ", letter);
                     }
                     else letter = swap[i+1];
 
-                    if (debug == 1)
-                    {
-                        printf("Letter after swapping: %c\n", letter);
-                    }
+                    charDebug("Letter after swapping: ", letter);
                     break;
                 }
             }
@@ -375,10 +406,7 @@ int main()
                 else
                 {
                     offset1-= 25;
-                    if (debug == 1)
-                    {
-                        printf("offset1 after rotating: %i\n", offset1);
-                    }
+                    intDebug("offset1 after rotating: ", offset1);
                 }
                 if (letter != 10)
                 {
@@ -389,41 +417,31 @@ int main()
               		++turnover1; //Notch to turn next rotor
               	}*/
     		}
-            if (debug == 1)
-            {
-                printAsChar(letter + offset1: , cha, letter); // More error checking
-            }
+            cha = letter;
+            charDebug("Letter + offset1 ", cha);
 
             if (letter > 90) // If the new value is greater than 90, take away 26 and tell me
     		{
     		    letter = letter - 26;
-                if (debug == 1)
-                {
-                    printAsChar(Letter - 26: , cha, letter);
-                }
+                cha = letter;
+                charDebug("Letter - 26: ", cha);
             }
     		if (letter < 65 && letter != 10 && letter != 32)
     		{
     			letter = letter + 26;
-                if (debug == 1)
-                {
-                    printAsChar(Letter + 26: , cha, letter);
-                }
+                cha = letter;
+                charDebug("Letter + 26: ", cha);
             }
 
     		//Actually sents the letter through the wiring
     		letter = rotorL(letter, lRotor, debug);
 
             timeL = 1; //timeL = 1 because the letter has gone through the left-hand rotor once.
-            if (debug == 1)
-            {
-            	printf("timeL after letter has gone through left-hand rotor: %i\n", timeL);
-            }
+            intDebug("timeL after letter has gone through left-hand rotor: ", timeL);
 
-            if (debug == 1)
-            {
-                printAsChar(Letter after first time through first rotor: , cha, letter);
-            }
+
+            cha = letter;
+            charDebug("Letter after first time through first rotor: ", cha);
 
     /*------------------------------------					------------------------------------*/
     /*------------------------------------*****Middle Rotor*****------------------------------------*/
@@ -433,36 +451,28 @@ int main()
     		if (letter != 32 && letter != 10) //According to Wikipedia, the Middle rotor was affected by the stepping as well. When the whole left-hand rotor turned, the contacts changed. i.e. If the rotor stepped once, when A was pressed, it would go through the B path and become K. The K would go into the Middle rotor as J.
     		{
                 letter-= offset1; // Changes letter based on offset1
-                if (debug == 1)
-                {
-                    printAsChar(Letter - offset1: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter - offset1:", cha);
             }
 
     		if (letter < 65 && letter != 10 && letter != 32)
     		{
     			letter = letter + 26;
-                if (debug == 1)
-                {
-                    printAsChar(Letter + 26: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter + 26: ", cha);
     		}
 
             if (letter != 32 && letter != 10) //Changing letter based on offset2
     		{
                 letter+= offset2; // Changes letter based on offset2
-                if (debug == 1)
-                {
-                    printAsChar(Letter + offset2: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter + offset2:", cha);
             }
             if (letter > 90) // If the new value is greater than 90, take away 25 and tell me
     		{
     		     letter = letter - 26;
-                 if (debug == 1)
-                 {
-                     printAsChar(Letter - 26: , cha, letter); // More error checking
-                 }
+                 toChar(cha, letter);
+                 charDebug("Letter - 26: ", cha);
     		}
 
     /*		if (turnover1 == 1)
@@ -475,10 +485,8 @@ int main()
             //Sends the letter through the wiring
     		letter = rotorM(letter, mRotor, debug);
             timeM = 1;
-            if (debug == 1)
-            {
-                printAsChar(Letter after first time through middle rotor: , cha, letter);
-            }
+            toChar(cha, letter);
+            charDebug("Letter after first time through middle rotor: ", cha);
 
     /*------------------------------------				    ------------------------------------*/
     /*------------------------------------*****Right-hand Rotor*****--------------------------------*/
@@ -487,35 +495,27 @@ int main()
             if (letter != 32 && letter != 10) //Changing letter based on offset2
             {
                 letter-= offset2; // Changes letter based on offset2
-                if (debug == 1)
-                {
-                    printAsChar(Letter - offset2: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter - offset2:", cha);
             }
             if (letter < 65 && letter != 10 && letter != 32)
             {
                 letter = letter + 26;
-                if (debug == 1)
-                {
-                    printAsChar(Letter + 26: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter + 26:", cha);
             }
 
             if (letter != 32 && letter != 10) //Changing letter based on offset2
             {
                 letter+= offset3; // Changes letter based on offset2
-                if (debug == 1)
-                {
-                    printAsChar(Letter + offset3: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter + offset3:", cha);
             }
             if (letter > 90) // If the new value is greater than 90, take away 25 and tell me
             {
                 letter = letter - 26;
-                if (debug == 1)
-                {
-                    printAsChar(Letter - 26: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter - 26: ", cha);
             }
 
     /*		if (turnover2 == 26)
@@ -527,10 +527,8 @@ int main()
             //Sends the letter through the wiring
     		letter = rotorR(letter, rRotor, debug);
             timeR = 1;
-            if (debug == 1)
-            {
-                printAsChar(Letter after first time through left-hand rotor: , cha, letter);
-            }
+            toChar(cha, letter);
+            charDebug("Letter after first time through right-hand rotor: ", cha);
 
     /*------------------------------------				  ------------------------------------*/
     /*------------------------------------*****Reflector*****------------------------------------*/
@@ -544,25 +542,19 @@ int main()
             if (letter != 32 && letter != 10) //Changing letter based on offset3
             {
                 letter-= offset3; // Changes letter based on offset3
-                if (debug == 1)
-                {
-                    printAsChar(Letter - offset3: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter - offset3:", cha);
             }
             if (letter < 65 && letter != 10 && letter != 32)
             {
                 letter = letter + 26;
-                if (debug == 1)
-                {
-                    printAsChar(Letter + 26: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter - 26: ", cha);
             }
 
             #include "rB"
-            if (debug == 1)
-            {
-                printAsChar(Letter after going through reflector: , cha, letter);
-            }
+            toChar(cha, letter);
+            charDebug("Letter after going through reflector: ", cha);
 
     /*------------------------------------							------------------------------------*/
     /*------------------------------------*****Back through the Right-hand Rotor*****--------------------*/
@@ -576,61 +568,47 @@ int main()
             if (letter != 32 && letter != 10) //Changing letter based on offset3
             {
                 letter+= offset3; // Changes letter based on offset3
-                if (debug == 1)
-                {
-                    printAsChar(Letter + offset3: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter + offset3:", cha);
             }
             if (letter > 90) // If the new value is greater than 90, take away 25 and tell me
             {
                  letter = letter - 26;
-                 if (debug == 1)
-                 {
-                     printAsChar(Letter - 26: , cha, letter); // More error checking
-                 }
+                 toChar(cha, letter);
+                 charDebug("Letter - 26: ", cha);
             }
 
             //Sends the letter through the wiring
     		letter = rotorR(letter, rRotor, debug);
-            if (debug == 1)
-            {
-                printAsChar(Letter after second time through left-hand rotor: , cha, letter);
-            }
+            toChar(cha, letter);
+            charDebug("Letter after second time through right-hand rotor: ", cha);
     /*------------------------------------								       ------------------------------------*/
     /*----------------------------------*****Back through the Middle Rotor*****------------------------------------*/
     /*------------------------------------								       ------------------------------------*/
             if (letter != 32 && letter != 10) //Changing letter based on offset3
             {
                 letter-= offset3; // Changes letter based on offset3
-                if (debug == 1)
-                {
-                    printAsChar(Letter - offset3: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter - offset3: ", cha);
             }
             if (letter < 65 && letter != 10 && letter != 32) //Makes sure the letter is not less than A
     		{
     			letter = letter + 26;
-                if (debug == 1)
-                {
-                    printAsChar(Letter + 26: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter + 26: ", cha);
     		}
 
             if (letter != 32 && letter != 10) //Changing letter based on offset2
             {
                 letter += offset2; // Changes letter based on offset2
-                if (debug == 1)
-                {
-                    printAsChar(Letter + offset2: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter + offset2:", cha);
             }
             if (letter > 90) // If the new value is greater than 90, take away 25 and tell me
             {
                  letter = letter - 26;
-                 if (debug == 1)
-                 {
-                     printAsChar(Letter - 26: , cha, letter); // More error checking
-                 }
+                 toChar(cha, letter);
+                 charDebug("Letter - 26: ", cha);
             }
 
             /*if (turnover1 == 1)
@@ -642,54 +620,41 @@ int main()
             //Sends the letter through the wiring
     		letter = rotorM(letter, mRotor, debug);
 
-
-            if (debug == 1)
-            {
-                printAsChar(Letter after second time through middle rotor: , cha, letter);
-            }
+            toChar(cha, letter);
+            charDebug("Letter after second time through middle rotor: ", cha);
 
             if (letter != 32 && letter != 10) //Changing letter based on offset2
             {
                 letter-= offset2; // Changes letter based on offset2
-                if (debug == 1)
-                {
-                    printAsChar(Letter - offset2: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter - offset2:", cha);
             }
             if (letter < 65 && letter != 10 && letter != 32) //Makes sure the letter is not less than A
     		{
     			letter = letter + 26;
-                if (debug == 1)
-                {
-                    printAsChar(Letter + 26: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter + 26:", cha);
     		}
 
             if (letter != 32 && letter != 10) //According to Wikipedia, the Middle rotor was affected by the stepping as well. When the whole left-hand rotor turned, the contacts changed. i.e. If the rotor stepped once, when A was pressed, it would go through the B path and become K. The K would go into the Middle rotor as J.
             {
                 letter = letter + offset1; // Changes letter based on offset1
-                if (debug == 1)
-                {
-                    printAsChar(Letter + offset1: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter + offset1:", cha);
             }
 
             if (letter > 90) // If the new value is greater than 90, take away 26 and tell me
     		{
     		     letter = letter - 26;
-                 if (debug == 1)
-                 {
-                     printAsChar(Letter - 26: , cha, letter); // More error checking
-                 }
+                 toChar(cha, letter);
+                 charDebug("Letter - 26:", cha);
     		}
 
     		if (letter < 65 && letter != 10 && letter != 32)
     		{
     			letter = letter + 26;
-                if (debug == 1)
-                {
-                    printAsChar(Letter + 26: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter + 26:", cha);
     		}
 
     /*------------------------------------								       ------------------------------------*/
@@ -698,50 +663,38 @@ int main()
 
     		if (letter < 32 && letter != 10) // As long as the ASCII value of the character imputted is less than 32, and not equal to 10,
     	     {
-    			letter = 48; // the new ASCII character is the one with the value of 48
+    			letter = 'Z'; // the new value is that of 'Z'
     		}
 
     		//Sends the letter through the wiring
     		letter = rotorL(letter, lRotor, debug);
 
-            if (debug == 1)
-            {
-                printAsChar(Letter after second time through left-hand rotor: , cha, letter);
-            }
+            toChar(cha, letter);
+            charDebug("Letter after second time through left-hand rotor: ", cha);
 
             if (letter < 65 && letter != 32 && letter != 10)
     		{
     			letter = letter + 26;
-                if (debug == 1)
-                {
-                    printAsChar(Letter + 26: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter + 26:", cha);
     		}
             if (letter > 90) // If the new value is greater than 90, take away 26 and tell me
     		{
     		     letter = letter - 26;
-                 if (debug == 1)
-                 {
-                     printAsChar(Letter - 26: , cha, letter); // More error checking
-                 }
+                 toChar(cha, letter);
+                 charDebug("Letter - 26:", cha);
     		}
     		if (letter != 10)
-            {
                 letter-= offset1;
-            }
 
     		if (letter < 65 && letter != 10 && letter != 32)
     		{
     			letter = letter + 26;
-                if (debug == 1)
-                {
-                    printAsChar(Letter + 26: , cha, letter); // More error checking
-                }
+                toChar(cha, letter);
+                charDebug("Letter + 26: ", cha);
     		}
-            if (debug == 1)
-            {
-                printAsChar(Letter - offset1:, cha, letter);
-            }
+            toChar(cha, letter);
+            charDebug("Letter - offset1:", cha);
 
     /*------------------------------------                   --------------------------------------*/
     /*------------------------------------*****Plugboard*****--------------------------------------*/
@@ -749,38 +702,27 @@ int main()
              for (i = 0; i < 13 && swap[i] != '\0'; i++){
                 if (letter == swap[i])
                 {
-                    if (debug == 1)
-                    {
-                        printf("Letter before swap: %c\n", letter);
-                    }
+                    charDebug("Letter before swap: ", letter);
                     if (i % 2 != 0)
                     {
                         letter = swap[i-1];
-                        if (debug == 1)
-                        {
-                            printf("i: %i\nLetter after swap: %c\n", i, letter);
-                        }
+                        charDebug("Letter after swap (i not an even number): ", letter);
                     }
                     else letter = swap[i+1];
 
-                    if (debug == 1)
-                    {
-                        printf("Letter after swapping: %c\n", letter);
-                    }
+                    charDebug("Letter after swapping: ", letter);
+
                     break;
                 }
             }
-
-
 
     /*------------------------------------				   ------------------------------------*/
     /*------------------------------------*****Printer*****------------------------------------*/
     /*------------------------------------				   ------------------------------------*/
 
-
             if (j != 1)
             {
-                cha = letter; // the CHAR is equal to the value of letter, and this converts the ASCII back to a letter
+                toChar(cha, letter); // the CHAR is equal to the value of letter, and this converts the ASCII back to a letter
                 printf("%c", cha); // Print it
                 output[fillOutput++] = cha;
             }
@@ -802,11 +744,11 @@ int main()
             {
                 spaces = letter;
                 letter = 'X';
+                j = 0;
             }
             else j = 0;
 
             toUppercase(letter);
-
     	}
     	output[fillOutput] = '\0';
 
@@ -818,19 +760,30 @@ int main()
                 getFilename(outputFile, putNl);
             }
             fp = fopen(OUTPUTFILE, "a");
+            if (linesProcessed == 0)
+            {
+                fprintf(fp, "==========================================================\n");
+            }
+            fprintf(fp, "%s\n", output);
+            fclose(fp);
         }
-        else fp = fopen("output.txt", "a");
-
+        else if (outputFile[0] != '\0')
+        {
+            fp = fopen("output.txt", "a");
+            if (linesProcessed == 0)
+            {
+                fprintf(fp, "==========================================================\n");
+            }
+            fprintf(fp, "%s\n", output);
+            fclose(fp);
+        }
+        else ;
         strDebug("Output string:", output);
-        fprintf(fp, "==========================================================\n");
-        fprintf(fp, "%s\n", output);
-        fclose(fp);
     }
 
     printf("\nEnter any letter to close the program: \n");
     i = getchar();
     return 0;
-
 }
 int bgetline(char s[], int putNl){
 	int i;
@@ -853,35 +806,27 @@ int rotorL(int letter, int lRotor, int debug){
 		switch (lRotor){
 		case 1:
 			#include "r1"
-			if (debug == 1)
-			{
-				printf("timeL: %i\nlRotor: %i\n", timeL, lRotor);
-				printf("Case 1.\n");
-			}
+			intDebug("timeL: ", timeL);
+            intDebug("lRotor: ", lRotor);
+			strDebug("Case 1.", "\n");
 			break;
 		case 2:
 			#include "r2"
-			if (debug == 1)
-			{
-				printf("timeL: %i\nlRotor: %i\n", timeL, lRotor);
-				printf("Case 2.\n");
-			}
+			intDebug("timeL: ", timeL);
+            intDebug("lRotor: ", lRotor);
+			strDebug("Case 2.", "\n");
 			break;
 		case 3:
 			#include "r3"
-			if (debug == 1)
-			{
-				printf("timeL: %i\nlRotor: %i\n", timeL, lRotor);
-				printf("Case 3.\n");
-			}
+			intDebug("timeL: ", timeL);
+            intDebug("lRotor: ", lRotor);
+			strDebug("Case 3.", "\n");
 			break;
 		default:
 			#include "r1"
-			if (debug == 1)
-			{
-				printf("timeL: %i\nlRotor: %i\n", timeL, lRotor);
-				printf("Case default.\n");
-			}
+			intDebug("timeL: ", timeL);
+            intDebug("lRotor: ", lRotor);
+			strDebug("Case default.", "\n");
 			break;
 		}
 	}
@@ -890,34 +835,28 @@ int rotorL(int letter, int lRotor, int debug){
 		case 1:
 			#include "r1Back"
 			if (debug == 1)
-			{
-				printf("timeL: %i\nlRotor: %i\n", timeL, lRotor);
-				printf("Case 1.\n");
-			}
+			intDebug("timeL: ", timeL);
+            intDebug("lRotor: ", lRotor);
+			strDebug("Case 1.", "\n");
 			break;
 		case 2:
 			#include "r2Back"
 			if (debug == 1)
-			{
-				printf("timeL: %i\nlRotor: %i\n", timeL, lRotor);
-				printf("Case 2.\n");
-			}
+			intDebug("timeL: ", timeL);
+            intDebug("lRotor: ", lRotor);
+			strDebug("Case 2.", "\n");
 			break;
 		case 3:
 			#include "r3Back"
-			if (debug == 1)
-			{
-				printf("timeL: %i\nlRotor: %i\n", timeL, lRotor);
-				printf("Case 3.\n");
-			}
+			intDebug("timeL: ", timeL);
+            intDebug("lRotor: ", lRotor);
+			strDebug("Case 3.", "\n");
 			break;
 		default:
 			#include "r1Back"
-			if (debug == 1)
-			{
-				printf("timeL: %i\nlRotor: %i\n", timeL, lRotor);
-				printf("Case default.\n");
-			}
+			intDebug("timeL: ", timeL);
+            intDebug("lRotor: ", lRotor);
+			strDebug("Case default.", "\n");
 			break;
 		}
 	}
@@ -929,35 +868,27 @@ int rotorM(int letter, int mRotor, int debug){
 		switch (mRotor){
 		case 1:
 			#include "r1"
-			if (debug == 1)
-			{
-				printf("timeM: %i\nmRotor: %i\n", timeM, mRotor);
-				printf("Case 1.\n");
-			}
+			intDebug("timeM: ", timeM);
+            intDebug("mRotor: ", mRotor);
+			strDebug("Case 1.", "\n");
 			break;
 		case 2:
 			#include "r2"
-			if (debug == 1)
-			{
-				printf("timeM: %i\nmRotor: %i\n", timeM, mRotor);
-				printf("Case 2.\n");
-			}
+			intDebug("timeM: ", timeM);
+            intDebug("mRotor: ", mRotor);
+			strDebug("Case 2.", "\n");
 			break;
 		case 3:
 			#include "r3"
-			if (debug == 1)
-			{
-				printf("timeM: %i\nmRotor: %i\n", timeM, mRotor);
-				printf("Case 3.\n");
-			}
+			intDebug("timeM: ", timeM);
+            intDebug("mRotor: ", mRotor);
+			strDebug("Case 3.", "\n");
 			break;
 		default:
 			#include "r1"
-			if (debug == 1)
-			{
-				printf("timeM: %i\nmRotor: %i\n", timeM, mRotor);
-				printf("Case default.\n");
-			}
+			intDebug("timeM: ", timeM);
+            intDebug("mRotor: ", mRotor);
+			strDebug("Case default.", "\n");
 			break;
 		}
 	}
@@ -965,35 +896,27 @@ int rotorM(int letter, int mRotor, int debug){
 		switch (mRotor){
 		case 1:
 			#include "r1Back"
-			if (debug == 1)
-			{
-				printf("timeM: %i\nmRotor: %i\n", timeM, mRotor);
-				printf("Case 1.\n");
-			}
+			intDebug("timeM: ", timeM);
+            intDebug("mRotor: ", mRotor);
+			strDebug("Case 1.", "\n");
 			break;
 		case 2:
 			#include "r2Back"
-			if (debug == 1)
-			{
-				printf("timeM: %i\nmRotor: %i\n", timeM, mRotor);
-				printf("Case 2.\n");
-			}
+			intDebug("timeM: ", timeM);
+            intDebug("mRotor: ", mRotor);
+			strDebug("Case 2.", "\n");
 			break;
 		case 3:
 			#include "r3Back"
-			if (debug == 1)
-			{
-				printf("timeM: %i\nmRotor: %i\n", timeM, mRotor);
-				printf("Case 3.\n");
-			}
+			intDebug("timeM: ", timeM);
+            intDebug("mRotor: ", mRotor);
+			strDebug("Case 3.", "\n");
 			break;
 		default:
 			#include "r1Back"
-			if (debug == 1)
-			{
-				printf("timeM: %i\nmRotor: %i\n", timeM, mRotor);
-				printf("Case default.\n");
-			}
+			intDebug("timeM: ", timeM);
+            intDebug("mRotor: ", mRotor);
+			strDebug("Case default.", "\n");
 			break;
 		}
 	}
@@ -1005,35 +928,27 @@ int rotorR(int letter, int rRotor, int debug){
 		switch (rRotor){
 		case 1:
 			#include "r1"
-			if (debug == 1)
-			{
-				printf("timeR: %i\nrRotor: %i\n", timeR, rRotor);
-				printf("Case 1.\n");
-			}
+			intDebug("timeR: ", timeR);
+            intDebug("rRotor: ", rRotor);
+			strDebug("Case 1.", "\n");
 			break;
 		case 2:
 			#include "r2"
-			if (debug == 1)
-			{
-				printf("timeR: %i\nrRotor: %i\n", timeR, rRotor);
-				printf("Case 2.\n");
-			}
+			intDebug("timeR: ", timeR);
+            intDebug("rRotor: ", rRotor);
+			strDebug("Case 2.", "\n");
 			break;
 		case 3:
 			#include "r3"
-			if (debug == 1)
-			{
-				printf("timeR: %i\nrRotor: %i\n", timeR, rRotor);
-				printf("Case 3.\n");
-			}
+			intDebug("timeR: ", timeR);
+            intDebug("rRotor: ", rRotor);
+			strDebug("Case 3.", "\n");
 			break;
 		default:
 			#include "r1"
-			if (debug == 1)
-			{
-				printf("timeR: %i\nrRotor: %i\n", timeR, rRotor);
-				printf("Case default.\n");
-			}
+			intDebug("timeR: ", timeR);
+            intDebug("rRotor: ", rRotor);
+			strDebug("Case default.", "\n");
 			break;
 		}
 	}
@@ -1041,41 +956,33 @@ int rotorR(int letter, int rRotor, int debug){
 		switch (rRotor){
 		case 1:
 			#include "r1Back"
-			if (debug == 1)
-			{
-				printf("timeR: %i\nrRotor: %i\n", timeR, rRotor);
-				printf("Case 1.\n");
-			}
+			intDebug("timeR: ", timeR);
+            intDebug("rRotor: ", rRotor);
+			strDebug("Case 1.", "\n");
 			break;
 		case 2:
 			#include "r2Back"
-			if (debug == 1)
-			{
-				printf("timeR: %i\nrRotor: %i\n", timeR, rRotor);
-				printf("Case 2.\n");
-			}
+			intDebug("timeR: ", timeR);
+            intDebug("rRotor: ", rRotor);
+			strDebug("Case 2.", "\n");
 			break;
 		case 3:
 			#include "r3Back"
-			if (debug == 1)
-			{
-				printf("timeR: %i\nrRotor: %i\n", timeR, rRotor);
-				printf("Case 3.\n");
-			}
+			intDebug("timeR: ", timeR);
+            intDebug("rRotor: ", rRotor);
+			strDebug("Case 3.", "\n");
 			break;
 		default:
 			#include "r1Back"
-			if (debug == 1)
-			{
-				printf("timeR: %i\nrRotor: %i\n", timeR, rRotor);
-				printf("Case default.\n");
-			}
+			intDebug("timeR: ", timeR);
+            intDebug("rRotor: ", rRotor);
+			strDebug("Case default.", "\n");
 			break;
 		}
 	}
 	return letter;
 }
-int setOptions(char options[], char *option, int *option1, int *option2, char filename[], int *setOutputFile, char outputFile[], int *setInputStorage, char inputStorage[]){
+int setOptions(char options[], char *option, int *option1, char debugFile[], int *option2, char filename[], int *setOutputFile, char outputFile[], int *setInputStorage, char inputStorage[]){
 
     int i, numLooped, k;
     i = numLooped = k = 0;
@@ -1095,6 +1002,15 @@ int setOptions(char options[], char *option, int *option1, int *option2, char fi
         if (i == 1)
         {
             *option1 = 1;
+        }
+        else if (i == 2)
+        {
+            *option1 = 2;
+            fillArray(options, debugFile, numLooped); //fills the file, starting where the count left off, to get the filename put by the user
+        }
+        else if (i == 3)
+        {
+            debugFile[0] = '\0';
         }
         else *option1 = 0;
         fclose(fp);
@@ -1126,12 +1042,12 @@ int setOptions(char options[], char *option, int *option1, int *option2, char fi
         if (i == 1)
         {
             *setOutputFile = 1;
-            outputFile[0] = '\n';
+            outputFile[0] = '\n'; //Filename will be given by user when that point is reached
         }
         else if (i == 2)
         {
             *setOutputFile = 1;
-            fillArray(options, outputFile, numLooped);
+            fillArray(options, outputFile, numLooped); //fills the file, starting where the count left off, to get the filename put by the user
         }
         else if (i == 3)
         {
@@ -1146,19 +1062,20 @@ int setOptions(char options[], char *option, int *option1, int *option2, char fi
     //    printf("Got through the next function.\n");
         if (i == 1)
         {
-            *setInputStorage = 1;
+            *setInputStorage = 1; //Filename will be given by user when that point is reached
             inputStorage[0] = '\n';
         }
         else if (i == 2)
         {
-            *setInputStorage = 1;
-            fillArray(options, inputStorage, numLooped);
+            *setInputStorage = 1; //Filename already supplied
+            fillArray(options, inputStorage, numLooped); //Fills the array for the inputStorage filename
         }
         else if (i == 3)
         {
-            inputStorage[0] = '\0';
+            inputStorage[0] = '\0'; //Don't store input.
+            //setInputStorage will already be 0, so it is not set again.
         }
-        else *setInputStorage = 0;
+        else *setInputStorage = 0; //Default. Set again because I had to put something there.
         fclose(fp);
     }
     return 1;
