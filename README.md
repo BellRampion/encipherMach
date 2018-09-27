@@ -38,10 +38,6 @@ enigmaFunct.h - The Enigma as a function / header file for use in other programs
 
 enigmaMach2Psuedocode - Psuedocode for the full Enigma
 
-prepForEnigma - Linux executable for a program that translates from Human-readable text to Enigma-readable text
-
-prepForEnigma.c - Code for program that translates between human-readable and Enigma-readable
-
 r1 - Rotor I for the Enigma
 
 r1Back - Rotor I for the Enigma, wiring reversed 
@@ -57,6 +53,10 @@ r3Back - Rotor III for the Enigma, wiring reversed
 rB - Reflector B for the Enigma
 
 reflector - Same as Reflector B, but more generic name; used in cTest
+
+transEnigma - Linux executable for a program that translates from Human-readable text to Enigma-readable text
+
+transEnigma.c - Code for program that translates between human-readable and Enigma-readable
 
 
 
