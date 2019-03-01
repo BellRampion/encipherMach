@@ -3,7 +3,7 @@
 # NOTES: 
 Program now handles spaces, but must be rerun after each newline is entered. Up to 9,098 characters may be entered at once. Spaces  are replaced by XX. (That is how spaces were entered on the Enigma.) 
 Now taking file input! Please make sure your file is compatible before feeding it to the program to avoid errors. No punctuation marks or other non-alphabet symbols are supported. 
-Latest update added a profile called ".enigmarc" that allows you to set options: debugging (which can be sent to a file), filename to read from, and files to write to. Press 'h' when prompted after running the program for details. The Windows .exe does NOT support this yet. 
+Latest update added a profile called ".enigmarc" that allows you to set options: debugging (which can be sent to a file), filename to read from, and files to write to. Press 'h' when prompted after running the program for details. The Windows .exe does support this.
 
 Double-click the engima.exe file to run on Windows. "enigma.c" is the C code file. "enigma" is the Linux executable. On Linux, you may have to run "chmod +x enigma" in the folder where the file is in order to have executing permissions for the file. 
 
