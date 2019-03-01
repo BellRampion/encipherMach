@@ -14,7 +14,7 @@ int main(int argc, char *argv[]){ //main() takes two argments: the number of arg
     //ints
     int i, l, linePlace, fLPlace;
     int tempFileLines = 0;
-    int debug = 1;
+    int debug = 0;
 
     //chars
     char c;
@@ -49,6 +49,7 @@ int main(int argc, char *argv[]){ //main() takes two argments: the number of arg
                     printf("Fileline: %s\n", fileline);
                 }
                 for (fLPlace = 0; (c = fileline[fLPlace]) != '\0'; fLPlace++){
+                    //ToUppercase
                     if (c >= 'a' && c <= 'z')
                     {
                         c+= ('A' - 'a');
@@ -244,8 +245,11 @@ int main(int argc, char *argv[]){ //main() takes two argments: the number of arg
                         case 10: //Leaves the newline
                             line[linePlace++] = 10;
                             break;
+                        case 13: //Carriage Return - windows uses that instead of newlinea
+                            line[linePlace++] = 10;
+                            break;
                         default:
-                            printf("Sorry, %c is not permitted. Please remove it from your file and rerun the program.\n", c);
+                            printf("Sorry, error: %c is not permitted. Please remove it from your file and rerun the program.\n", c);
                             return -1;
                         }
                     }

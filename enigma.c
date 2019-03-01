@@ -3,6 +3,8 @@
 /*THE ENIGMA MACHINE*/
 /*Created by Bailie Livingston.*/
 
+/*STATUS: Updated 2/28/19 to use arrays for rotor wiring, not switch statements. No longer requires r1, r1Back, etc. */
+
 #define charDebug(x, y) if (debug == 1) \
                         { \
                             if (fileDebug != 1) /*This cannot be done as an ifdef because those can't be inside macro definitions*/ \
@@ -66,6 +68,7 @@
 
 int bgetline(char s[], int putNl);
 int fillArray(char options[], char filename[], int numLooped);
+int findInArray(char list[], char character);
 int isOptionSet(char options[], char *option, FILE *fp, int *numLooped); //Takes the file and actually reads it. Returns 0 if a specific option isn't supposed to be set
 int rotorL(int letter, int lRotor, int debug); //Left-hand rotor
 int rotorM(int letter, int mRotor, int debug); //Middle rotor
@@ -78,6 +81,11 @@ int timeM; //Whether the value has gone through the middle rotor once or not
 int timeR; //Whether the value has gone through the right-hand rotor once or not
 char debugFile[MAXLENGTH]; //Filename to debug into
 FILE *debuggingFile; //Pointer to the debugging file
+char stdAlphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+char rotor1Wiring[] = "EKMFLGDQVZNTOWYHXUSPAIBRCJ";
+char rotor2Wiring[] = "AJDKSIRUXBLHWTMCQGZNPYFVOE";
+char rotor3Wiring[] = "BDFHJLCPRTXVZNYEIWGAKMUSQO";
+char reflectorBWiring[] = "YRUHQSLDPXNGOKMIEBFZCWVJAT";
 
 int main()
 {
@@ -801,29 +809,34 @@ int bgetline(char s[], int putNl){
 	return i;
 }
 int rotorL(int letter, int lRotor, int debug){
+    int index;
 	if (timeL != 1)
 	{
 		switch (lRotor){
 		case 1:
-			#include "r1"
+			index = findInArray(stdAlphabet, letter);
+            letter = rotor1Wiring[index];
 			intDebug("timeL: ", timeL);
             intDebug("lRotor: ", lRotor);
 			strDebug("Case 1.", "\n");
 			break;
 		case 2:
-			#include "r2"
+            index = findInArray(stdAlphabet, letter);
+            letter = rotor2Wiring[index];
 			intDebug("timeL: ", timeL);
             intDebug("lRotor: ", lRotor);
 			strDebug("Case 2.", "\n");
 			break;
 		case 3:
-			#include "r3"
+            index = findInArray(stdAlphabet, letter);
+            letter = rotor3Wiring[index];
 			intDebug("timeL: ", timeL);
             intDebug("lRotor: ", lRotor);
 			strDebug("Case 3.", "\n");
 			break;
 		default:
-			#include "r1"
+            index = findInArray(stdAlphabet, letter);
+            letter = rotor1Wiring[index];
 			intDebug("timeL: ", timeL);
             intDebug("lRotor: ", lRotor);
 			strDebug("Case default.", "\n");
@@ -833,27 +846,31 @@ int rotorL(int letter, int lRotor, int debug){
 	else {
 		switch (lRotor){
 		case 1:
-			#include "r1Back"
+            index = findInArray(rotor1Wiring, letter);
+            letter = stdAlphabet[index];
 			if (debug == 1)
 			intDebug("timeL: ", timeL);
             intDebug("lRotor: ", lRotor);
 			strDebug("Case 1.", "\n");
 			break;
 		case 2:
-			#include "r2Back"
+            index = findInArray(rotor2Wiring, letter);
+            letter = stdAlphabet[index];
 			if (debug == 1)
 			intDebug("timeL: ", timeL);
             intDebug("lRotor: ", lRotor);
 			strDebug("Case 2.", "\n");
 			break;
 		case 3:
-			#include "r3Back"
+            index = findInArray(rotor3Wiring, letter);
+            letter = stdAlphabet[index];
 			intDebug("timeL: ", timeL);
             intDebug("lRotor: ", lRotor);
 			strDebug("Case 3.", "\n");
 			break;
 		default:
-			#include "r1Back"
+            index = findInArray(rotor1Wiring, letter);
+            letter = stdAlphabet[index];
 			intDebug("timeL: ", timeL);
             intDebug("lRotor: ", lRotor);
 			strDebug("Case default.", "\n");
@@ -863,29 +880,35 @@ int rotorL(int letter, int lRotor, int debug){
 	return letter;
 }
 int rotorM(int letter, int mRotor, int debug){
+    int index;
+
 	if (timeM != 1)
 	{
 		switch (mRotor){
 		case 1:
-			#include "r1"
+            index = findInArray(stdAlphabet, letter);
+            letter = rotor1Wiring[index];
 			intDebug("timeM: ", timeM);
             intDebug("mRotor: ", mRotor);
 			strDebug("Case 1.", "\n");
 			break;
 		case 2:
-			#include "r2"
+            index = findInArray(stdAlphabet, letter);
+            letter = rotor2Wiring[index];
 			intDebug("timeM: ", timeM);
             intDebug("mRotor: ", mRotor);
 			strDebug("Case 2.", "\n");
 			break;
 		case 3:
-			#include "r3"
+            index = findInArray(stdAlphabet, letter);
+            letter = rotor3Wiring[index];
 			intDebug("timeM: ", timeM);
             intDebug("mRotor: ", mRotor);
 			strDebug("Case 3.", "\n");
 			break;
 		default:
-			#include "r1"
+            index = findInArray(stdAlphabet, letter);
+            letter = rotor2Wiring[index];
 			intDebug("timeM: ", timeM);
             intDebug("mRotor: ", mRotor);
 			strDebug("Case default.", "\n");
@@ -895,25 +918,29 @@ int rotorM(int letter, int mRotor, int debug){
 	else {
 		switch (mRotor){
 		case 1:
-			#include "r1Back"
+            index = findInArray(rotor1Wiring, letter);
+            letter = stdAlphabet[index];
 			intDebug("timeM: ", timeM);
             intDebug("mRotor: ", mRotor);
 			strDebug("Case 1.", "\n");
 			break;
 		case 2:
-			#include "r2Back"
+            index = findInArray(rotor2Wiring, letter);
+            letter = stdAlphabet[index];
 			intDebug("timeM: ", timeM);
             intDebug("mRotor: ", mRotor);
 			strDebug("Case 2.", "\n");
 			break;
 		case 3:
-			#include "r3Back"
+            index = findInArray(rotor3Wiring, letter);
+            letter = stdAlphabet[index];
 			intDebug("timeM: ", timeM);
             intDebug("mRotor: ", mRotor);
 			strDebug("Case 3.", "\n");
 			break;
 		default:
-			#include "r1Back"
+            index = findInArray(rotor2Wiring, letter);
+            letter = stdAlphabet[index];
 			intDebug("timeM: ", timeM);
             intDebug("mRotor: ", mRotor);
 			strDebug("Case default.", "\n");
@@ -923,29 +950,35 @@ int rotorM(int letter, int mRotor, int debug){
 	return letter;
 }
 int rotorR(int letter, int rRotor, int debug){
+    int index;
+
 	if (timeR != 1)
 	{
 		switch (rRotor){
 		case 1:
-			#include "r1"
+            index = findInArray(stdAlphabet, letter);
+            letter = rotor1Wiring[index];
 			intDebug("timeR: ", timeR);
             intDebug("rRotor: ", rRotor);
 			strDebug("Case 1.", "\n");
 			break;
 		case 2:
-			#include "r2"
+            index = findInArray(stdAlphabet, letter);
+            letter = rotor2Wiring[index];
 			intDebug("timeR: ", timeR);
             intDebug("rRotor: ", rRotor);
 			strDebug("Case 2.", "\n");
 			break;
 		case 3:
-			#include "r3"
+            index = findInArray(stdAlphabet, letter);
+            letter = rotor3Wiring[index];
 			intDebug("timeR: ", timeR);
             intDebug("rRotor: ", rRotor);
 			strDebug("Case 3.", "\n");
 			break;
 		default:
-			#include "r1"
+            index = findInArray(stdAlphabet, letter);
+            letter = rotor3Wiring[index];
 			intDebug("timeR: ", timeR);
             intDebug("rRotor: ", rRotor);
 			strDebug("Case default.", "\n");
@@ -955,25 +988,29 @@ int rotorR(int letter, int rRotor, int debug){
 	else {
 		switch (rRotor){
 		case 1:
-			#include "r1Back"
+            index = findInArray(rotor1Wiring, letter);
+            letter = stdAlphabet[index];
 			intDebug("timeR: ", timeR);
             intDebug("rRotor: ", rRotor);
 			strDebug("Case 1.", "\n");
 			break;
 		case 2:
-			#include "r2Back"
+            index = findInArray(rotor2Wiring, letter);
+            letter = stdAlphabet[index];
 			intDebug("timeR: ", timeR);
             intDebug("rRotor: ", rRotor);
 			strDebug("Case 2.", "\n");
 			break;
 		case 3:
-			#include "r3Back"
+            index = findInArray(rotor3Wiring, letter);
+            letter = stdAlphabet[index];
 			intDebug("timeR: ", timeR);
             intDebug("rRotor: ", rRotor);
 			strDebug("Case 3.", "\n");
 			break;
 		default:
-			#include "r1Back"
+            index = findInArray(rotor3Wiring, letter);
+            letter = stdAlphabet[index];
 			intDebug("timeR: ", timeR);
             intDebug("rRotor: ", rRotor);
 			strDebug("Case default.", "\n");
@@ -1170,4 +1207,19 @@ int fillArray(char options[], char filename[], int numLooped){
     }
     return i;
 
+}
+
+//Finds the first occurence of a character in an array
+int findInArray(char list[], char character){
+    int i;
+
+    for (i = 0; i < MAXLENGTH && (list[i] != '\0'); i++){
+        if (list[i] == character)
+        {
+            //Return index of character
+            return i;
+        }
+    }
+    //Does not contain character
+    return -1;
 }
