@@ -7,10 +7,10 @@ Latest update added a profile called ".enigmarc" that allows you to set options:
 
 Double-click the engima.exe file to run on Windows. "enigma.c" is the C code file. "enigma" is the Linux executable. On Linux, you may have to run "chmod +x enigma" in the folder where the file is in order to have executing permissions for the file. 
 
-"cTest.c", "cTest", and "cTest.exe" are the C code file and the Linux and Windows executables, respectively, for an Enigma with the rotors hard-coded to certain posotions. 
+"cTest.c", "cTest", and "cTest.exe" are the C code file and the Linux and Windows executables, respectively, for an Enigma with the rotors hard-coded to certain positions. 
 
-Input, output, and key settings are stored in files called input.txt, output.txt, and key_settings.txt. 
-Program requires r1, r2, r3, etc. to run. DO NOT delete those files. 
+Input, output, and key settings are, by default (if those options are enabled), stored in files called input.txt, output.txt, and key_settings.txt. 
+The full Enigma no longer requires r1, r2, etc.
 
 # LIST OF FILES:
 
