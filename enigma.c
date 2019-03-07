@@ -1,9 +1,7 @@
-﻿#include <stdio.h>
+#include <stdio.h>
 
 /*THE ENIGMA MACHINE*/
 /*Created by Bailie Livingston.*/
-
-/*STATUS: Updated 2/28/19 to use arrays for rotor wiring, not switch statements. No longer requires r1, r1Back, etc. */
 
 #define charDebug(x, y) if (debug == 1) \
                         { \
@@ -17,7 +15,7 @@
                             } \
                         }
 
-#define ctoi(c) i = (c -'0');
+#define ctoi(c) c = (c -'0');
 
 #define DEBUGGINGFILE debugFile
 
@@ -80,7 +78,7 @@ int timeL; //Whether the value has gone through the left-hand rotor once or not
 int timeM; //Whether the value has gone through the middle rotor once or not
 int timeR; //Whether the value has gone through the right-hand rotor once or not
 char debugFile[MAXLENGTH]; //Filename to debug into
-FILE *debuggingFile; //Pointer to the debugging file
+FILE *debuggingFile; //Pointer to the debugging file. Must be global because of the rotor functions.
 char stdAlphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 char rotor1Wiring[] = "EKMFLGDQVZNTOWYHXUSPAIBRCJ";
 char rotor2Wiring[] = "AJDKSIRUXBLHWTMCQGZNPYFVOE";
@@ -96,6 +94,7 @@ int main()
     int filelength = 0;
     int fillOutput = 0; //Filling output[] for printing to a file
     int i, j, k, l, m; //Random vars to do whatever.
+    int index = 0;
     int letter; // The ASCII value of the key pressed
     int linesProcessed = 0;
     int lRotor; //Rotor used for the left-hand rotor
@@ -164,14 +163,19 @@ int main()
         fprintf(debuggingFile, "==New runthrough==\n");
         fileDebug = 1;
     }
+    else if (debug == 3)
+    {
+        fileDebug = 0;
+        debug = 1;
+    }
     else ;
 
-	printf("Choose the rotor to put in the left-hand slot: (1, 2, or 3) [1]\n");
+	printf("Choose the rotor to put in the right-hand slot: (1, 2, or 3) [1]\n");
 	if ((cha = getchar()) != '\n')
         newline = getchar();
     else cha = '1';
-	lRotor = ctoi(cha);
-	intDebug("The converted rotor number: ", lRotor);
+	rRotor = ctoi(cha);
+	intDebug("The converted rotor number: ", rRotor);
 
 	printf("Choose the rotor to put in the middle slot: (1, 2, or 3) [2]\n");
     if ((cha = getchar()) != '\n')
@@ -180,16 +184,16 @@ int main()
 	mRotor = ctoi(cha);
 	intDebug("The converted rotor number: ", mRotor);
 
-	printf("Choose the rotor to put in the right-hand slot: (1, 2, or 3) [3]\n");
+	printf("Choose the rotor to put in the left-hand slot: (1, 2, or 3) [3]\n");
     if ((cha = getchar()) != '\n')
         newline = getchar();
     else cha = '3';
-	rRotor = ctoi(cha);
-	intDebug("The converted rotor number: ", rRotor);
+	lRotor = ctoi(cha);
+	intDebug("The converted rotor number: ", lRotor);
 
     fp = fopen("key_settings.txt", "a"); //Opens a file for appending to add the key settings for this message
 
-    printf("Set left-hand rotor: (enter an uppercase letter from A-Z): \n");
+    printf("Set right-hand rotor: (enter an uppercase letter from A-Z): \n");
     i = getchar();
     newline = getchar();
     toUppercase(i);
@@ -205,7 +209,7 @@ int main()
     fprintf(fp, "%c", cha);
     offset2 = i - 'A'; //Entering A will produce an offset of 0, entering B gives 1, and so on
 
-    printf("Set right-hand rotor: (enter an uppercase letter from A-Z): \n");
+    printf("Set left-hand rotor: (enter an uppercase letter from A-Z): \n");
     i = getchar();
     newline = getchar();
     toUppercase(i);
@@ -375,10 +379,7 @@ int main()
              for (i = 0; i < 13 && swap[i] != '\0'; i++){
                 if (letter == swap[i])
                 {
-                    if (debug == 1)
-                    {
-                        printf("Letter before swap: %c\n", letter);
-                    }
+                    charDebug("Letter after swapping: ", letter);
                     if (i % 2 != 0)
                     {
                         letter = swap[i-1];
@@ -394,7 +395,7 @@ int main()
 
 
     /*------------------------------------					   ------------------------------------*/
-    /*------------------------------------*****Left-hand Rotor*****--------------------------------*/
+    /*------------------------------------*****Right-hand Rotor*****--------------------------------*/
     /*------------------------------------					   ------------------------------------*/
 
     		if (letter < 32 && letter != 10) // As long as the ASCII value of the character imputted is less than 32, and not equal to 10,
@@ -402,14 +403,11 @@ int main()
     			letter = 48; // the new ASCII character is the one with the value of 48
     		}
 
-
-    //		printf("letter %i ", letter); // Value of letter is printed. This is for error checking.
     		if (letter != 32 && letter != 10)
     		{
                 if (offset1 < 25)
                 {
                     ++offset1; //The rotor advances before enciphering the letter just entered. This is a feature of the real machine.
-                    //printf("\nIncreased offset1 by one: %i\n", offset1);
                 }
                 else
                 {
@@ -431,8 +429,7 @@ int main()
             if (letter > 90) // If the new value is greater than 90, take away 26 and tell me
     		{
     		    letter = letter - 26;
-                cha = letter;
-                charDebug("Letter - 26: ", cha);
+                charDebug("Letter - 26: ", letter);
             }
     		if (letter < 65 && letter != 10 && letter != 32)
     		{
@@ -442,14 +439,12 @@ int main()
             }
 
     		//Actually sents the letter through the wiring
-    		letter = rotorL(letter, lRotor, debug);
+    		letter = rotorR(letter, rRotor, debug);
 
-            timeL = 1; //timeL = 1 because the letter has gone through the left-hand rotor once.
-            intDebug("timeL after letter has gone through left-hand rotor: ", timeL);
+            timeR = 1; //Marks going through RH rotor once
+            intDebug("timeR after letter has gone through right-hand rotor: ", timeR);
 
-
-            cha = letter;
-            charDebug("Letter after first time through first rotor: ", cha);
+            charDebug("Letter after first time through first rotor: ", letter);
 
     /*------------------------------------					------------------------------------*/
     /*------------------------------------*****Middle Rotor*****------------------------------------*/
@@ -497,7 +492,7 @@ int main()
             charDebug("Letter after first time through middle rotor: ", cha);
 
     /*------------------------------------				    ------------------------------------*/
-    /*------------------------------------*****Right-hand Rotor*****--------------------------------*/
+    /*------------------------------------*****Left-hand Rotor*****--------------------------------*/
     /*------------------------------------				    ------------------------------------*/
 
             if (letter != 32 && letter != 10) //Changing letter based on offset2
@@ -513,9 +508,9 @@ int main()
                 charDebug("Letter + 26:", cha);
             }
 
-            if (letter != 32 && letter != 10) //Changing letter based on offset2
+            if (letter != 32 && letter != 10) //Changing letter based on offset3
             {
-                letter+= offset3; // Changes letter based on offset2
+                letter += offset3; // Changes letter based on offset3
                 toChar(cha, letter);
                 charDebug("Letter + offset3:", cha);
             }
@@ -533,10 +528,10 @@ int main()
     		} */
 
             //Sends the letter through the wiring
-    		letter = rotorR(letter, rRotor, debug);
-            timeR = 1;
+    		letter = rotorL(letter, lRotor, debug);
+            timeL = 1;
             toChar(cha, letter);
-            charDebug("Letter after first time through right-hand rotor: ", cha);
+            charDebug("Letter after first time through left-hand rotor: ", cha);
 
     /*------------------------------------				  ------------------------------------*/
     /*------------------------------------*****Reflector*****------------------------------------*/
@@ -556,16 +551,15 @@ int main()
             if (letter < 65 && letter != 10 && letter != 32)
             {
                 letter = letter + 26;
-                toChar(cha, letter);
-                charDebug("Letter - 26: ", cha);
+                charDebug("Letter + 26: ", letter);
             }
 
-            #include "rB"
-            toChar(cha, letter);
-            charDebug("Letter after going through reflector: ", cha);
+            index = findInArray(stdAlphabet, letter);
+            letter = reflectorBWiring[index];
+            charDebug("\nLetter after going through reflector: ", letter);
 
     /*------------------------------------							------------------------------------*/
-    /*------------------------------------*****Back through the Right-hand Rotor*****--------------------*/
+    /*----------------------------*****Back through the Left-hand Rotor*****---------------------------*/
     /*------------------------------------							------------------------------------*/
 
     /*		if (turnover2 == 26)
@@ -587,7 +581,7 @@ int main()
             }
 
             //Sends the letter through the wiring
-    		letter = rotorR(letter, rRotor, debug);
+    		letter = rotorL(letter, lRotor, debug);
             toChar(cha, letter);
             charDebug("Letter after second time through right-hand rotor: ", cha);
     /*------------------------------------								       ------------------------------------*/
@@ -666,7 +660,7 @@ int main()
     		}
 
     /*------------------------------------								       ------------------------------------*/
-    /*------------------------------------*****Back through the Left-hand Rotor*****-------------------------------*/
+    /*---------------------------------*****Back through the Right-hand Rotor*****---------------------------------*/
     /*------------------------------------								       ------------------------------------*/
 
     		if (letter < 32 && letter != 10) // As long as the ASCII value of the character imputted is less than 32, and not equal to 10,
@@ -675,16 +669,14 @@ int main()
     		}
 
     		//Sends the letter through the wiring
-    		letter = rotorL(letter, lRotor, debug);
+    		letter = rotorR(letter, rRotor, debug);
 
-            toChar(cha, letter);
-            charDebug("Letter after second time through left-hand rotor: ", cha);
+            charDebug("Letter after second time through left-hand rotor: ", letter);
 
             if (letter < 65 && letter != 32 && letter != 10)
     		{
     			letter = letter + 26;
-                toChar(cha, letter);
-                charDebug("Letter + 26:", cha);
+                charDebug("Letter + 26:", letter);
     		}
             if (letter > 90) // If the new value is greater than 90, take away 26 and tell me
     		{
@@ -736,10 +728,7 @@ int main()
             }
             else printNl;
 
-            if (debug == 1)
-            {
-                printNl;
-            }
+            strDebug("\n", "");
 
     		letter = input[countInput++];
 
@@ -752,7 +741,6 @@ int main()
             {
                 spaces = letter;
                 letter = 'X';
-                j = 0;
             }
             else j = 0;
 
@@ -1019,6 +1007,7 @@ int rotorR(int letter, int rRotor, int debug){
 	}
 	return letter;
 }
+//Handles option setting from the file
 int setOptions(char options[], char *option, int *option1, char debugFile[], int *option2, char filename[], int *setOutputFile, char outputFile[], int *setInputStorage, char inputStorage[]){
 
     int i, numLooped, k;
@@ -1048,6 +1037,7 @@ int setOptions(char options[], char *option, int *option1, char debugFile[], int
         else if (i == 3)
         {
             debugFile[0] = '\0';
+            *option1 = 3;
         }
         else *option1 = 0;
         fclose(fp);
@@ -1208,8 +1198,6 @@ int fillArray(char options[], char filename[], int numLooped){
     return i;
 
 }
-
-//Finds the first occurence of a character in an array
 int findInArray(char list[], char character){
     int i;
 
